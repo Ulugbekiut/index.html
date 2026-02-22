@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>16 Data Structures — Google L4 Prep</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --border: #1e1e2e;
+    --accent: #00ff88;
+    --accent2: #ff6b35;
+    --accent3: #7c3aed;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --code-bg: #0d0d14;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+  }
+  header {
+    padding: 48px 40px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  header h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    letter-spacing: -2px;
+    line-height: 1;
+  }
+  header h1 span { color: var(--accent); }
+  header p { color: var(--muted); font-size: 0.9rem; font-family: 'JetBrains Mono', monospace; }
+  .layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: calc(100vh - 120px);
+  }
+  nav {
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+    position: sticky;
+    top: 0;
+    height: calc(100vh - 120px);
+    overflow-y: auto;
+  }
+  nav::-webkit-scrollbar { width: 4px; }
+  nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .nav-group { margin-bottom: 24px; }
+  .nav-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--muted);
+    padding: 0 20px 8px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 20px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    color: var(--muted);
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+  }
+  .nav-item:hover { color: var(--text); background: var(--surface); }
+  .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(0,255,136,0.05); }
+  .nav-item .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent3);
+    min-width: 20px;
+  }
+  main { padding: 40px; overflow-y: auto; }
+  .ds-card {
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+  .ds-card.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-num {
+    font-size: 4rem;
+    font-weight: 800;
+    color: var(--border);
+    line-height: 1;
+    font-family: 'JetBrains Mono', monospace;
+    min-width: 80px;
+  }
+  .card-title { font-size: 2rem; font-weight: 800; letter-spacing: -1px; }
+  .card-title small { display: block; font-size: 0.8rem; font-weight: 400; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-top: 4px; }
+  .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .tag {
+    font-size: 0.7rem;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .tag-must { background: rgba(0,255,136,0.1); color: var(--accent); border: 1px solid rgba(0,255,136,0.3); }
+  .tag-strong { background: rgba(255,107,53,0.1); color: var(--accent2); border: 1px solid rgba(255,107,53,0.3); }
+  .tag-diff { background: rgba(124,58,237,0.1); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); }
+  .complexity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .complexity-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    text-align: center;
+  }
+  .complexity-box .op { font-size: 0.7rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .complexity-box .val { font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--accent); }
+  .complexity-box .val.orange { color: var(--accent2); }
+  .complexity-box .val.red { color: #f87171; }
+  .section-title {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 12px;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.7;
+    margin-bottom: 28px;
+    position: relative;
+  }
+  pre .kw { color: #c792ea; }
+  pre .fn { color: #82aaff; }
+  pre .str { color: #c3e88d; }
+  pre .num { color: #f78c6c; }
+  pre .cm { color: #546e7a; font-style: italic; }
+  pre .cls { color: #ffcb6b; }
+  .use-cases {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .use-case {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent3);
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 0.82rem;
+    color: var(--text);
+  }
+  .use-case strong { display: block; color: #a78bfa; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; font-family: 'JetBrains Mono', monospace; }
+  .copy-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--border);
+    border: none;
+    color: var(--muted);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-family: 'JetBrains Mono', monospace;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover { background: var(--accent); color: #000; }
+  @media (max-width: 768px) {
+    .layout { grid-template-columns: 1fr; }
+    nav { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); display: flex; overflow-x: auto; padding: 12px 0; }
+    .nav-group { display: flex; margin-bottom: 0; min-width: max-content; }
+    .nav-label { display: none; }
+    main { padding: 24px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>16 Data Structures<br><span>Google L4 Prep</span></h1>
+  </div>
+  <p>// complete implementations in JavaScript</p>
+</header>
+
+<div class="layout">
+  <nav id="nav"></nav>
+  <main id="main"></main>
+</div>
+
+<script>
+const structures = [
+  {
+    id: 1, name: "Arrays & Strings", slug: "arrays",
+    category: "Must Know Cold",
+    tagType: "must",
+    subtitle: "Two Pointers · Sliding Window · Prefix Sums",
+    complexity: [
+      { op: "Access", val: "O(1)" },
+      { op: "Search", val: "O(n)", cls: "orange" },
+      { op: "Insert", val: "O(n)", cls: "orange" },
+      { op: "Delete", val: "O(n)", cls: "orange" },
+    ],
+    useCases: [
+      { title: "Two Sum", desc: "Find pair summing to target using hashmap" },
+      { title: "Sliding Window", desc: "Max subarray, longest substring" },
+      { title: "Prefix Sums", desc: "Range sum queries in O(1)" },
+    ],
+    code: `<span class="cm">// ── Two Pointers ──────────────────────────────────</span>
+<span class="kw">function</span> <span class="fn">twoSum</span>(nums, target) {
+  <span class="kw">let</span> left = <span class="num">0</span>, right = nums.length - <span class="num">1</span>;
+  <span class="kw">while</span> (left < right) {
+    <span class="kw">const</span> sum = nums[left] + nums[right];
+    <span class="kw">if</span> (sum === target) <span class="kw">return</span> [left, right];
+    sum < target ? left++ : right--;
+  }
+  <span class="kw">return</span> [];
+}
+
+<span class="cm">// ── Sliding Window ────────────────────────────────</span>
+<span class="kw">function</span> <span class="fn">maxSubarraySum</span>(nums, k) {
+  <span class="kw">let</span> sum = nums.slice(<span class="num">0</span>, k).reduce((a,b) => a+b, <span class="num">0</span>);
+  <span class="kw">let</span> max = sum;
+  <span class="kw">for</span> (<span class="kw">let</span> i = k; i < nums.length; i++) {
+    sum += nums[i] - nums[i - k];
+    max = Math.max(max, sum);
+  }
+  <span class="kw">return</span> max;
+}
+
+<span class="cm">// ── Prefix Sums ──────────────────────────────────</span>
+<span class="kw">class</span> <span class="cls">PrefixSum</span> {
+  <span class="fn">constructor</span>(nums) {
+    <span class="kw">this</span>.prefix = [<span class="num">0</span>];
+    <span class="kw">for</span> (<span class="kw">const</span> n <span class="kw">of</span> nums)
+      <span class="kw">this</span>.prefix.push(<span class="kw">this</span>.prefix.at(-<span class="num">1</span>) + n);
+  }
+  <span class="fn">rangeSum</span>(l, r) { <span class="kw">return this</span>.prefix[r+<span class="num">1</span>] - <span class="kw">this</span>.prefix[l]; }
+}`
+  },
+  {
+    id: 2, name: "Hash Map & Set", slug: "hashmap",
+    category: "Must Know Cold",
+    tagType: "must",
+    subtitle: "Frequency · Lookup · Grouping",
+    complexity: [
+      { op: "Get", val: "O(1)" },
+      { op: "Set", val: "O(1)" },
+      { op: "Delete", val: "O(1)" },
+      { op: "Worst", val: "O(n)", cls: "orange" },
+    ],
+    useCases: [
+      { title: "Frequency Count", desc: "Anagrams, top K elements" },
+      { title: "Two Sum", desc: "Complement lookup in O(n)" },
+      { title: "Grouping", desc: "Group anagrams, categorize data" },
+    ],
+    code: `<span class="cm">// ── Frequency Counter ─────────────────────────────</span>
+<span class="kw">function</span> <span class="fn">groupAnagrams</span>(strs) {
+  <span class="kw">const</span> map = <span class="kw">new</span> <span class="cls">Map</span>();
+  <span class="kw">for</span> (<span class="kw">const</span> s <span class="kw">of</span> strs) {
+    <span class="kw">const</span> key = [...s].sort().join(<span class="str">''</span>);
+    <span class="kw">if</span> (!map.has(key)) map.set(key, []);
+    map.get(key).push(s);
+  }
+  <span class="kw">return</span> [...map.values()];
+}
+
+<span class="cm">// ── Two Sum O(n) ──────────────────────────────────</span>
+<span class="kw">function</span> <span class="fn">twoSumHash</span>(nums, target) {
+  <span class="kw">const</span> seen = <span class="kw">new</span> <span class="cls">Map</span>();
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < nums.length; i++) {
+    <span class="kw">const</span> comp = target - nums[i];
+    <span class="kw">if</span> (seen.has(comp)) <span class="kw">return</span> [seen.get(comp), i];
+    seen.set(nums[i], i);
+  }
+}
+
+<span class="cm">// ── Sliding Window + HashSet ──────────────────────</span>
+<span class="kw">function</span> <span class="fn">lengthOfLongestSubstring</span>(s) {
+  <span class="kw">const</span> set = <span class="kw">new</span> <span class="cls">Set</span>();
+  <span class="kw">let</span> left = <span class="num">0</span>, max = <span class="num">0</span>;
+  <span class="kw">for</span> (<span class="kw">let</span> r = <span class="num">0</span>; r < s.length; r++) {
+    <span class="kw">while</span> (set.has(s[r])) { set.delete(s[left++]); }
+    set.add(s[r]);
+    max = Math.max(max, r - left + <span class="num">1</span>);
+  }
+  <span class="kw">return</span> max;
+}`
+  },
+  {
+    id: 3, name: "Linked List", slug: "linkedlist",
+    category: "Must Know Cold",
+    tagType: "must",
+    subtitle: "Fast/Slow Pointers · Reverse · Cycle Detection",
+    complexity: [
+      { op: "Access", val: "O(n)", cls: "orange" },
+      { op: "Search", val: "O(n)", cls: "orange" },
+      { op: "Insert Head", val: "O(1)" },
+      { op: "Delete Head", val: "O(1)" },
+    ],
+    useCases: [
+      { title: "Cycle Detection", desc: "Floyd's tortoise & hare" },
+      { title: "Reversal", desc: "In-place list reversal" },
+      { title: "Merge K Lists", desc: "Divide & conquer, heap" },
+    ],
+    code: `<span class="kw">class</span> <span class="cls">ListNode</span> {
+  <span class="fn">constructor</span>(val) { <span class="kw">this</span>.val = val; <span class="kw">this</span>.next = <span class="kw">null</span>; }
+}
+
+<span class="cm">// ── Reverse Linked List ───────────────────────────</span>
+<span class="kw">function</span> <span class="fn">reverse</span>(head) {
+  <span class="kw">let</span> prev = <span class="kw">null</span>, curr = head;
+  <span class="kw">while</span> (curr) {
+    <span class="kw">const</span> next = curr.next;
+    curr.next = prev;
+    prev = curr;
+    curr = next;
+  }
+  <span class="kw">return</span> prev;
+}
+
+<span class="cm">// ── Floyd's Cycle Detection ───────────────────────</span>
+<span class="kw">function</span> <span class="fn">hasCycle</span>(head) {
+  <span class="kw">let</span> slow = head, fast = head;
+  <span class="kw">while</span> (fast && fast.next) {
+    slow = slow.next;
+    fast = fast.next.next;
+    <span class="kw">if</span> (slow === fast) <span class="kw">return true</span>;
+  }
+  <span class="kw">return false</span>;
+}
+
+<span class="cm">// ── Find Middle ──────────────────────────────────</span>
+<span class="kw">function</span> <span class="fn">findMiddle</span>(head) {
+  <span class="kw">let</span> slow = head, fast = head;
+  <span class="kw">while</span> (fast && fast.next) {
+    slow = slow.next;
+    fast = fast.next.next;
+  }
+  <span class="kw">return</span> slow;
+}
+
+<span class="cm">// ── Merge Two Sorted Lists ────────────────────────</span>
+<span class="kw">function</span> <span class="fn">mergeTwoLists</span>(l1, l2) {
+  <span class="kw">const</span> dummy = <span class="kw">new</span> <span class="cls">ListNode</span>(<span class="num">0</span>);
+  <span class="kw">let</span> curr = dummy;
+  <span class="kw">while</span> (l1 && l2) {
+    <span class="kw">if</span> (l1.val <= l2.val) { curr.next = l1; l1 = l1.next; }
+    <span class="kw">else</span> { curr.next = l2; l2 = l2.next; }
+    curr = curr.next;
+  }
+  curr.next = l1 || l2;
+  <span class="kw">return</span> dummy.next;
+}`
+  },
+  {
+    id: 4, name: "Stack & Queue", slug: "stack",
+    category: "Must Know Cold",
+    tagType: "must",
+    subtitle: "Monotonic Stack · Deque · Queue via Stacks",
+    complexity: [
+      { op: "Push", val: "O(1)" },
+      { op: "Pop", val: "O(1)" },
+      { op: "Peek", val: "O(1)" },
+      { op: "Search", val: "O(n)", cls: "orange" },
+    ],
+    useCases: [
+      { title: "Monotonic Stack", desc: "Next greater element, histogram" },
+      { title: "Valid Parentheses", desc: "Balanced brackets" },
+      { title: "BFS Queue", desc: "Level-order traversal" },
+    ],
+    code: `<span class="cm">// ── Monotonic Stack (Next Greater Element) ────────</span>
+<span class="kw">function</span> <span class="fn">nextGreater</span>(nums) {
+  <span class="kw">const</span> result = <span class="kw">new</span> <span class="cls">Array</span>(nums.length).fill(-<span class="num">1</span>);
+  <span class="kw">const</span> stack = []; <span class="cm">// indices</span>
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < nums.length; i++) {
+    <span class="kw">while</span> (stack.length && nums[i] > nums[stack.at(-<span class="num">1</span>)]) {
+      result[stack.pop()] = nums[i];
+    }
+    stack.push(i);
+  }
+  <span class="kw">return</span> result;
+}
+
+<span class="cm">// ── Valid Parentheses ─────────────────────────────</span>
+<span class="kw">function</span> <span class="fn">isValid</span>(s) {
+  <span class="kw">const</span> map = { <span class="str">')'</span>:<span class="str">'('</span>, <span class="str">'}'</span>:<span class="str">'{'</span>, <span class="str">']'</span>:<span class="str">'['</span> };
+  <span class="kw">const</span> stack = [];
+  <span class="kw">for</span> (<span class="kw">const</span> c <span class="kw">of</span> s) {
+    <span class="kw">if</span> (!map[c]) stack.push(c);
+    <span class="kw">else if</span> (stack.pop() !== map[c]) <span class="kw">return false</span>;
+  }
+  <span class="kw">return</span> stack.length === <span class="num">0</span>;
+}
+
+<span class="cm">// ── Queue using Two Stacks ────────────────────────</span>
+<span class="kw">class</span> <span class="cls">MyQueue</span> {
+  <span class="fn">constructor</span>() { <span class="kw">this</span>.in = []; <span class="kw">this</span>.out = []; }
+  <span class="fn">push</span>(x) { <span class="kw">this</span>.in.push(x); }
+  <span class="fn">pop</span>() {
+    <span class="kw">if</span> (!<span class="kw">this</span>.out.length)
+      <span class="kw">while</span> (<span class="kw">this</span>.in.length) <span class="kw">this</span>.out.push(<span class="kw">this</span>.in.pop());
+    <span class="kw">return this</span>.out.pop();
+  }
+  <span class="fn">peek</span>() { <span class="kw">this</span>.pop(); <span class="kw">const</span> v = <span class="kw">this</span>.out.at(-<span class="num">1</span>); <span class="kw">return</span> v; }
+  <span class="fn">empty</span>() { <span class="kw">return</span> !<span class="kw">this</span>.in.length && !<span class="kw">this</span>.out.length; }
+}`
+  },
+  {
+    id: 5, name: "Binary Tree", slug: "tree",
+    category: "Must Know Cold",
+    tagType: "must",
+    subtitle: "DFS · BFS · LCA · BST",
+    complexity: [
+      { op: "Access", val: "O(n)", cls: "orange" },
+      { op: "BST Search", val: "O(log n)" },
+      { op: "Insert", val: "O(log n)" },
+      { op: "Traversal", val: "O(n)", cls: "orange" },
+    ],
+    useCases: [
+      { title: "LCA", desc: "Lowest Common Ancestor" },
+      { title: "Level Order", desc: "BFS with queue" },
+      { title: "Path Sum", desc: "DFS root-to-leaf" },
+    ],
+    code: `<span class="kw">class</span> <span class="cls">TreeNode</span> {
+  <span class="fn">constructor</span>(val) { <span class="kw">this</span>.val=val; <span class="kw">this</span>.left=<span class="kw">this</span>.right=<span class="kw">null</span>; }
+}
+
+<span class="cm">// ── All DFS Traversals ────────────────────────────</span>
+<span class="kw">const</span> <span class="fn">inorder</span>  = (n, r=[]) => n ? (<span class="fn">inorder</span>(n.left,r), r.push(n.val), <span class="fn">inorder</span>(n.right,r), r) : r;
+<span class="kw">const</span> <span class="fn">preorder</span> = (n, r=[]) => n ? (r.push(n.val), <span class="fn">preorder</span>(n.left,r), <span class="fn">preorder</span>(n.right,r), r) : r;
+<span class="kw">const</span> <span class="fn">postorder</span>= (n, r=[]) => n ? (<span class="fn">postorder</span>(n.left,r), <span class="fn">postorder</span>(n.right,r), r.push(n.val), r) : r;
+
+<span class="cm">// ── BFS Level Order ───────────────────────────────</span>
+<span class="kw">function</span> <span class="fn">levelOrder</span>(root) {
+  <span class="kw">if</span> (!root) <span class="kw">return</span> [];
+  <span class="kw">const</span> result = [], queue = [root];
+  <span class="kw">while</span> (queue.length) {
+    <span class="kw">const</span> level = [], size = queue.length;
+    <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < size; i++) {
+      <span class="kw">const</span> node = queue.shift();
+      level.push(node.val);
+      <span class="kw">if</span> (node.left) queue.push(node.left);
+      <span class="kw">if</span> (node.right) queue.push(node.right);
+    }
+    result.push(level);
+  }
+  <span class="kw">return</span> result;
+}
+
+<span class="cm">// ── Lowest Common Ancestor ────────────────────────</span>
+<span class="kw">function</span> <span class="fn">lca</span>(root, p, q) {
+  <span class="kw">if</span> (!root || root === p || root === q) <span class="kw">return</span> root;
+  <span class="kw">const</span> left = <span class="fn">lca</span>(root.left, p, q);
+  <span class="kw">const</span> right = <span class="fn">lca</span>(root.right, p, q);
+  <span class="kw">return</span> left && right ? root : left || right;
+}
+
+<span class="cm">// ── Max Path Sum ──────────────────────────────────</span>
+<span class="kw">function</span> <span class="fn">maxPathSum</span>(root) {
+  <span class="kw">let</span> max = -Infinity;
+  <span class="kw">const</span> <span class="fn">dfs</span> = n => {
+    <span class="kw">if</span> (!n) <span class="kw">return</span> <span class="num">0</span>;
+    <span class="kw">const</span> l = Math.max(<span class="num">0</span>, <span class="fn">dfs</span>(n.left)), r = Math.max(<span class="num">0</span>, <span class="fn">dfs</span>(n.right));
+    max = Math.max(max, n.val + l + r);
+    <span class="kw">return</span> n.val + Math.max(l, r);
+  };
+  <span class="fn">dfs</span>(root); <span class="kw">return</span> max;
+}`
+  },
+  {
+    id: 6, name: "Graph", slug: "graph",
+    category: "Must Know Cold",
+    tagType: "must",
+    subtitle: "BFS · DFS · Topological Sort · Union-Find",
+    complexity: [
+      { op: "Add Vertex", val: "O(1)" },
+      { op: "Add Edge", val: "O(1)" },
+      { op: "BFS/DFS", val: "O(V+E)", cls: "orange" },
+      { op: "Dijkstra", val: "O(E log V)", cls: "orange" },
+    ],
+    useCases: [
+      { title: "Shortest Path", desc: "BFS for unweighted, Dijkstra for weighted" },
+      { title: "Topo Sort", desc: "Course scheduling, dependency resolution" },
+      { title: "Islands", desc: "Connected components via DFS/BFS" },
+    ],
+    code: `<span class="cm">// ── Graph BFS ─────────────────────────────────────</span>
+<span class="kw">function</span> <span class="fn">bfs</span>(graph, start) {
+  <span class="kw">const</span> visited = <span class="kw">new</span> <span class="cls">Set</span>([start]), queue = [start];
+  <span class="kw">while</span> (queue.length) {
+    <span class="kw">const</span> node = queue.shift();
+    <span class="kw">for</span> (<span class="kw">const</span> nei <span class="kw">of</span> graph[node] || []) {
+      <span class="kw">if</span> (!visited.has(nei)) { visited.add(nei); queue.push(nei); }
+    }
+  }
+  <span class="kw">return</span> visited;
+}
+
+<span class="cm">// ── Topological Sort (Kahn's BFS) ─────────────────</span>
+<span class="kw">function</span> <span class="fn">topoSort</span>(n, edges) {
+  <span class="kw">const</span> indegree = <span class="kw">new</span> <span class="cls">Array</span>(n).fill(<span class="num">0</span>);
+  <span class="kw">const</span> adj = <span class="cls">Array</span>.from({length: n}, () => []);
+  <span class="kw">for</span> (<span class="kw">const</span> [u, v] <span class="kw">of</span> edges) { adj[u].push(v); indegree[v]++; }
+  <span class="kw">const</span> queue = [], result = [];
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < n; i++) <span class="kw">if</span> (!indegree[i]) queue.push(i);
+  <span class="kw">while</span> (queue.length) {
+    <span class="kw">const</span> u = queue.shift(); result.push(u);
+    <span class="kw">for</span> (<span class="kw">const</span> v <span class="kw">of</span> adj[u]) <span class="kw">if</span> (--indegree[v] === <span class="num">0</span>) queue.push(v);
+  }
+  <span class="kw">return</span> result.length === n ? result : []; <span class="cm">// [] = cycle</span>
+}
+
+<span class="cm">// ── Number of Islands (BFS) ───────────────────────</span>
+<span class="kw">function</span> <span class="fn">numIslands</span>(grid) {
+  <span class="kw">let</span> count = <span class="num">0</span>;
+  <span class="kw">const</span> <span class="fn">bfs</span> = (r, c) => {
+    <span class="kw">const</span> q = [[r,c]]; grid[r][c] = <span class="str">'0'</span>;
+    <span class="kw">while</span> (q.length) {
+      <span class="kw">const</span> [x,y] = q.shift();
+      <span class="kw">for</span> (<span class="kw">const</span> [dx,dy] <span class="kw">of</span> [[-<span class="num">1</span>,<span class="num">0</span>],[<span class="num">1</span>,<span class="num">0</span>],[<span class="num">0</span>,-<span class="num">1</span>],[<span class="num">0</span>,<span class="num">1</span>]]) {
+        <span class="kw">const</span> nx=x+dx, ny=y+dy;
+        <span class="kw">if</span> (nx>=<span class="num">0</span>&&nx<grid.length&&ny>=<span class="num">0</span>&&ny<grid[<span class="num">0</span>].length&&grid[nx][ny]===<span class="str">'1'</span>)
+          { grid[nx][ny]=<span class="str">'0'</span>; q.push([nx,ny]); }
+      }
+    }
+  };
+  <span class="kw">for</span> (<span class="kw">let</span> r=<span class="num">0</span>;r<grid.length;r++)
+    <span class="kw">for</span> (<span class="kw">let</span> c=<span class="num">0</span>;c<grid[<span class="num">0</span>].length;c++)
+      <span class="kw">if</span>(grid[r][c]===<span class="str">'1'</span>){<span class="fn">bfs</span>(r,c);count++;}
+  <span class="kw">return</span> count;
+}`
+  },
+  {
+    id: 7, name: "Heap / Priority Queue", slug: "heap",
+    category: "Must Know Cold",
+    tagType: "must",
+    subtitle: "Min-Heap · Max-Heap · K-th Largest",
+    complexity: [
+      { op: "Insert", val: "O(log n)" },
+      { op: "Extract Min", val: "O(log n)" },
+      { op: "Peek Min", val: "O(1)" },
+      { op: "Build Heap", val: "O(n)", cls: "orange" },
+    ],
+    useCases: [
+      { title: "Top K Elements", desc: "K largest/smallest in O(n log k)" },
+      { title: "Merge K Lists", desc: "Always pick minimum node" },
+      { title: "Dijkstra", desc: "Priority queue for shortest path" },
+    ],
+    code: `<span class="cm">// ── Min-Heap Implementation ───────────────────────</span>
+<span class="kw">class</span> <span class="cls">MinHeap</span> {
+  <span class="fn">constructor</span>() { <span class="kw">this</span>.heap = []; }
+  <span class="fn">push</span>(val) {
+    <span class="kw">this</span>.heap.push(val);
+    <span class="kw">this</span>.<span class="fn">_bubbleUp</span>(<span class="kw">this</span>.heap.length - <span class="num">1</span>);
+  }
+  <span class="fn">pop</span>() {
+    <span class="kw">const</span> min = <span class="kw">this</span>.heap[<span class="num">0</span>];
+    <span class="kw">const</span> last = <span class="kw">this</span>.heap.pop();
+    <span class="kw">if</span> (<span class="kw">this</span>.heap.length) { <span class="kw">this</span>.heap[<span class="num">0</span>] = last; <span class="kw">this</span>.<span class="fn">_siftDown</span>(<span class="num">0</span>); }
+    <span class="kw">return</span> min;
+  }
+  <span class="fn">peek</span>() { <span class="kw">return this</span>.heap[<span class="num">0</span>]; }
+  <span class="fn">size</span>() { <span class="kw">return this</span>.heap.length; }
+  <span class="fn">_bubbleUp</span>(i) {
+    <span class="kw">while</span> (i > <span class="num">0</span>) {
+      <span class="kw">const</span> p = Math.floor((i-<span class="num">1</span>)/<span class="num">2</span>);
+      <span class="kw">if</span> (<span class="kw">this</span>.heap[p] <= <span class="kw">this</span>.heap[i]) <span class="kw">break</span>;
+      [<span class="kw">this</span>.heap[p], <span class="kw">this</span>.heap[i]] = [<span class="kw">this</span>.heap[i], <span class="kw">this</span>.heap[p]];
+      i = p;
+    }
+  }
+  <span class="fn">_siftDown</span>(i) {
+    <span class="kw">const</span> n = <span class="kw">this</span>.heap.length;
+    <span class="kw">while</span> (true) {
+      <span class="kw">let</span> min = i;
+      <span class="kw">const</span> l=<span class="num">2</span>*i+<span class="num">1</span>, r=<span class="num">2</span>*i+<span class="num">2</span>;
+      <span class="kw">if</span> (l<n && <span class="kw">this</span>.heap[l]<<span class="kw">this</span>.heap[min]) min=l;
+      <span class="kw">if</span> (r<n && <span class="kw">this</span>.heap[r]<<span class="kw">this</span>.heap[min]) min=r;
+      <span class="kw">if</span> (min===i) <span class="kw">break</span>;
+      [<span class="kw">this</span>.heap[i],<span class="kw">this</span>.heap[min]]=[<span class="kw">this</span>.heap[min],<span class="kw">this</span>.heap[i]];
+      i=min;
+    }
+  }
+}
+
+<span class="cm">// ── K Largest Elements ────────────────────────────</span>
+<span class="kw">function</span> <span class="fn">kLargest</span>(nums, k) {
+  <span class="kw">const</span> heap = <span class="kw">new</span> <span class="cls">MinHeap</span>();
+  <span class="kw">for</span> (<span class="kw">const</span> n <span class="kw">of</span> nums) {
+    heap.<span class="fn">push</span>(n);
+    <span class="kw">if</span> (heap.<span class="fn">size</span>() > k) heap.<span class="fn">pop</span>();
+  }
+  <span class="kw">return</span> heap.heap;
+}`
+  },
+  {
+    id: 8, name: "Union-Find (DSU)", slug: "unionfind",
+    category: "Must Know Cold",
+    tagType: "must",
+    subtitle: "Path Compression · Union by Rank",
+    complexity: [
+      { op: "Find", val: "O(α(n))" },
+      { op: "Union", val: "O(α(n))" },
+      { op: "Connected", val: "O(α(n))" },
+      { op: "Init", val: "O(n)", cls: "orange" },
+    ],
+    useCases: [
+      { title: "Connected Components", desc: "Number of provinces, friends" },
+      { title: "Kruskal's MST", desc: "Minimum spanning tree" },
+      { title: "Redundant Connection", desc: "Detect cycle in undirected graph" },
+    ],
+    code: `<span class="kw">class</span> <span class="cls">UnionFind</span> {
+  <span class="fn">constructor</span>(n) {
+    <span class="kw">this</span>.parent = <span class="cls">Array</span>.from({length: n}, (_, i) => i);
+    <span class="kw">this</span>.rank = <span class="kw">new</span> <span class="cls">Array</span>(n).fill(<span class="num">0</span>);
+    <span class="kw">this</span>.components = n;
+  }
+  <span class="fn">find</span>(x) {
+    <span class="kw">if</span> (<span class="kw">this</span>.parent[x] !== x)
+      <span class="kw">this</span>.parent[x] = <span class="kw">this</span>.<span class="fn">find</span>(<span class="kw">this</span>.parent[x]); <span class="cm">// path compression</span>
+    <span class="kw">return this</span>.parent[x];
+  }
+  <span class="fn">union</span>(x, y) {
+    <span class="kw">const</span> px = <span class="kw">this</span>.<span class="fn">find</span>(x), py = <span class="kw">this</span>.<span class="fn">find</span>(y);
+    <span class="kw">if</span> (px === py) <span class="kw">return false</span>; <span class="cm">// already connected</span>
+    <span class="kw">if</span> (<span class="kw">this</span>.rank[px] < <span class="kw">this</span>.rank[py]) <span class="kw">this</span>.parent[px] = py;
+    <span class="kw">else if</span> (<span class="kw">this</span>.rank[px] > <span class="kw">this</span>.rank[py]) <span class="kw">this</span>.parent[py] = px;
+    <span class="kw">else</span> { <span class="kw">this</span>.parent[py] = px; <span class="kw">this</span>.rank[px]++; }
+    <span class="kw">this</span>.components--;
+    <span class="kw">return true</span>;
+  }
+  <span class="fn">connected</span>(x, y) { <span class="kw">return this</span>.<span class="fn">find</span>(x) === <span class="kw">this</span>.<span class="fn">find</span>(y); }
+}
+
+<span class="cm">// ── Example: Number of Provinces ──────────────────</span>
+<span class="kw">function</span> <span class="fn">findCircleNum</span>(isConnected) {
+  <span class="kw">const</span> n = isConnected.length;
+  <span class="kw">const</span> uf = <span class="kw">new</span> <span class="cls">UnionFind</span>(n);
+  <span class="kw">for</span> (<span class="kw">let</span> i=<span class="num">0</span>; i<n; i++)
+    <span class="kw">for</span> (<span class="kw">let</span> j=i+<span class="num">1</span>; j<n; j++)
+      <span class="kw">if</span> (isConnected[i][j]) uf.<span class="fn">union</span>(i, j);
+  <span class="kw">return</span> uf.components;
+}`
+  },
+  {
+    id: 9, name: "Trie (Prefix Tree)", slug: "trie",
+    category: "Strongly Expected",
+    tagType: "strong",
+    subtitle: "Autocomplete · Word Search · Prefix Lookup",
+    complexity: [
+      { op: "Insert", val: "O(m)" },
+      { op: "Search", val: "O(m)" },
+      { op: "StartsWith", val: "O(m)" },
+      { op: "Space", val: "O(ALPHABET·n·m)", cls: "red" },
+    ],
+    useCases: [
+      { title: "Autocomplete", desc: "Typeahead, search suggestions" },
+      { title: "Word Dictionary", desc: "Add/search with wildcards" },
+      { title: "IP Routing", desc: "Longest prefix matching" },
+    ],
+    code: `<span class="kw">class</span> <span class="cls">TrieNode</span> {
+  <span class="fn">constructor</span>() {
+    <span class="kw">this</span>.children = {};
+    <span class="kw">this</span>.isEnd = <span class="kw">false</span>;
+  }
+}
+
+<span class="kw">class</span> <span class="cls">Trie</span> {
+  <span class="fn">constructor</span>() { <span class="kw">this</span>.root = <span class="kw">new</span> <span class="cls">TrieNode</span>(); }
+
+  <span class="fn">insert</span>(word) {
+    <span class="kw">let</span> node = <span class="kw">this</span>.root;
+    <span class="kw">for</span> (<span class="kw">const</span> c <span class="kw">of</span> word) {
+      <span class="kw">if</span> (!node.children[c]) node.children[c] = <span class="kw">new</span> <span class="cls">TrieNode</span>();
+      node = node.children[c];
+    }
+    node.isEnd = <span class="kw">true</span>;
+  }
+
+  <span class="fn">search</span>(word) {
+    <span class="kw">let</span> node = <span class="kw">this</span>.root;
+    <span class="kw">for</span> (<span class="kw">const</span> c <span class="kw">of</span> word) {
+      <span class="kw">if</span> (!node.children[c]) <span class="kw">return false</span>;
+      node = node.children[c];
+    }
+    <span class="kw">return</span> node.isEnd;
+  }
+
+  <span class="fn">startsWith</span>(prefix) {
+    <span class="kw">let</span> node = <span class="kw">this</span>.root;
+    <span class="kw">for</span> (<span class="kw">const</span> c <span class="kw">of</span> prefix) {
+      <span class="kw">if</span> (!node.children[c]) <span class="kw">return false</span>;
+      node = node.children[c];
+    }
+    <span class="kw">return true</span>;
+  }
+
+  <span class="fn">autocomplete</span>(prefix) {
+    <span class="kw">let</span> node = <span class="kw">this</span>.root;
+    <span class="kw">for</span> (<span class="kw">const</span> c <span class="kw">of</span> prefix) {
+      <span class="kw">if</span> (!node.children[c]) <span class="kw">return</span> [];
+      node = node.children[c];
+    }
+    <span class="kw">const</span> results = [];
+    <span class="kw">const</span> <span class="fn">dfs</span> = (n, path) => {
+      <span class="kw">if</span> (n.isEnd) results.push(prefix + path);
+      <span class="kw">for</span> (<span class="kw">const</span> [c, child] <span class="kw">of</span> <span class="cls">Object</span>.entries(n.children))
+        <span class="fn">dfs</span>(child, path + c);
+    };
+    <span class="fn">dfs</span>(node, <span class="str">''</span>);
+    <span class="kw">return</span> results;
+  }
+}`
+  },
+  {
+    id: 10, name: "Dynamic Programming", slug: "dp",
+    category: "Strongly Expected",
+    tagType: "strong",
+    subtitle: "Memoization · Tabulation · Classic Patterns",
+    complexity: [
+      { op: "1D DP", val: "O(n)" },
+      { op: "2D DP", val: "O(n·m)", cls: "orange" },
+      { op: "Knapsack", val: "O(n·W)", cls: "orange" },
+      { op: "Space", val: "O(n) opt." },
+    ],
+    useCases: [
+      { title: "Coin Change", desc: "Minimum coins for target amount" },
+      { title: "LCS", desc: "Longest common subsequence" },
+      { title: "Knapsack", desc: "0/1 and unbounded variants" },
+    ],
+    code: `<span class="cm">// ── Coin Change (Bottom-Up) ───────────────────────</span>
+<span class="kw">function</span> <span class="fn">coinChange</span>(coins, amount) {
+  <span class="kw">const</span> dp = <span class="kw">new</span> <span class="cls">Array</span>(amount+<span class="num">1</span>).fill(Infinity);
+  dp[<span class="num">0</span>] = <span class="num">0</span>;
+  <span class="kw">for</span> (<span class="kw">let</span> i=<span class="num">1</span>; i<=amount; i++)
+    <span class="kw">for</span> (<span class="kw">const</span> c <span class="kw">of</span> coins)
+      <span class="kw">if</span> (c <= i) dp[i] = Math.min(dp[i], dp[i-c]+<span class="num">1</span>);
+  <span class="kw">return</span> dp[amount] === Infinity ? -<span class="num">1</span> : dp[amount];
+}
+
+<span class="cm">// ── Longest Common Subsequence ────────────────────</span>
+<span class="kw">function</span> <span class="fn">lcs</span>(s1, s2) {
+  <span class="kw">const</span> m=s1.length, n=s2.length;
+  <span class="kw">const</span> dp = <span class="cls">Array</span>.from({length:m+<span class="num">1</span>},()=><span class="kw">new</span> <span class="cls">Array</span>(n+<span class="num">1</span>).fill(<span class="num">0</span>));
+  <span class="kw">for</span> (<span class="kw">let</span> i=<span class="num">1</span>;i<=m;i++)
+    <span class="kw">for</span> (<span class="kw">let</span> j=<span class="num">1</span>;j<=n;j++)
+      dp[i][j] = s1[i-<span class="num">1</span>]===s2[j-<span class="num">1</span>] ? dp[i-<span class="num">1</span>][j-<span class="num">1</span>]+<span class="num">1</span>
+                                       : Math.max(dp[i-<span class="num">1</span>][j], dp[i][j-<span class="num">1</span>]);
+  <span class="kw">return</span> dp[m][n];
+}
+
+<span class="cm">// ── 0/1 Knapsack ──────────────────────────────────</span>
+<span class="kw">function</span> <span class="fn">knapsack</span>(weights, values, capacity) {
+  <span class="kw">const</span> n = weights.length;
+  <span class="kw">const</span> dp = <span class="kw">new</span> <span class="cls">Array</span>(capacity+<span class="num">1</span>).fill(<span class="num">0</span>);
+  <span class="kw">for</span> (<span class="kw">let</span> i=<span class="num">0</span>;i<n;i++)
+    <span class="kw">for</span> (<span class="kw">let</span> w=capacity;w>=weights[i];w--)
+      dp[w] = Math.max(dp[w], dp[w-weights[i]]+values[i]);
+  <span class="kw">return</span> dp[capacity];
+}
+
+<span class="cm">// ── Longest Increasing Subsequence (O(n log n)) ───</span>
+<span class="kw">function</span> <span class="fn">lis</span>(nums) {
+  <span class="kw">const</span> tails = [];
+  <span class="kw">for</span> (<span class="kw">const</span> n <span class="kw">of</span> nums) {
+    <span class="kw">let</span> lo=<span class="num">0</span>, hi=tails.length;
+    <span class="kw">while</span>(lo<hi){<span class="kw">const</span> m=(lo+hi)>>><span class="num">1</span>; tails[m]<n?lo=m+<span class="num">1</span>:hi=m;}
+    tails[lo]=n;
+  }
+  <span class="kw">return</span> tails.length;
+}`
+  },
+  {
+    id: 11, name: "Segment Tree", slug: "segtree",
+    category: "Strongly Expected",
+    tagType: "strong",
+    subtitle: "Range Queries · Point Updates",
+    complexity: [
+      { op: "Build", val: "O(n)", cls: "orange" },
+      { op: "Query", val: "O(log n)" },
+      { op: "Update", val: "O(log n)" },
+      { op: "Space", val: "O(n)", cls: "orange" },
+    ],
+    useCases: [
+      { title: "Range Sum Query", desc: "Sum/min/max over any range" },
+      { title: "Range Min Query", desc: "RMQ in O(log n) after build" },
+      { title: "Interval Problems", desc: "Count inversions, range updates" },
+    ],
+    code: `<span class="kw">class</span> <span class="cls">SegmentTree</span> {
+  <span class="fn">constructor</span>(nums) {
+    <span class="kw">this</span>.n = nums.length;
+    <span class="kw">this</span>.tree = <span class="kw">new</span> <span class="cls">Array</span>(<span class="num">4</span> * <span class="kw">this</span>.n).fill(<span class="num">0</span>);
+    <span class="kw">this</span>.<span class="fn">build</span>(nums, <span class="num">0</span>, <span class="num">0</span>, <span class="kw">this</span>.n - <span class="num">1</span>);
+  }
+
+  <span class="fn">build</span>(nums, node, start, end) {
+    <span class="kw">if</span> (start === end) { <span class="kw">this</span>.tree[node] = nums[start]; <span class="kw">return</span>; }
+    <span class="kw">const</span> mid = (start + end) >> <span class="num">1</span>;
+    <span class="kw">this</span>.<span class="fn">build</span>(nums, <span class="num">2</span>*node+<span class="num">1</span>, start, mid);
+    <span class="kw">this</span>.<span class="fn">build</span>(nums, <span class="num">2</span>*node+<span class="num">2</span>, mid+<span class="num">1</span>, end);
+    <span class="kw">this</span>.tree[node] = <span class="kw">this</span>.tree[<span class="num">2</span>*node+<span class="num">1</span>] + <span class="kw">this</span>.tree[<span class="num">2</span>*node+<span class="num">2</span>];
+  }
+
+  <span class="fn">update</span>(i, val, node=<span class="num">0</span>, start=<span class="num">0</span>, end=<span class="kw">this</span>.n-<span class="num">1</span>) {
+    <span class="kw">if</span> (start === end) { <span class="kw">this</span>.tree[node] = val; <span class="kw">return</span>; }
+    <span class="kw">const</span> mid = (start + end) >> <span class="num">1</span>;
+    i <= mid ? <span class="kw">this</span>.<span class="fn">update</span>(i, val, <span class="num">2</span>*node+<span class="num">1</span>, start, mid)
+             : <span class="kw">this</span>.<span class="fn">update</span>(i, val, <span class="num">2</span>*node+<span class="num">2</span>, mid+<span class="num">1</span>, end);
+    <span class="kw">this</span>.tree[node] = <span class="kw">this</span>.tree[<span class="num">2</span>*node+<span class="num">1</span>] + <span class="kw">this</span>.tree[<span class="num">2</span>*node+<span class="num">2</span>];
+  }
+
+  <span class="fn">query</span>(l, r, node=<span class="num">0</span>, start=<span class="num">0</span>, end=<span class="kw">this</span>.n-<span class="num">1</span>) {
+    <span class="kw">if</span> (r < start || end < l) <span class="kw">return</span> <span class="num">0</span>;
+    <span class="kw">if</span> (l <= start && end <= r) <span class="kw">return this</span>.tree[node];
+    <span class="kw">const</span> mid = (start + end) >> <span class="num">1</span>;
+    <span class="kw">return this</span>.<span class="fn">query</span>(l,r,<span class="num">2</span>*node+<span class="num">1</span>,start,mid)
+         + <span class="kw">this</span>.<span class="fn">query</span>(l,r,<span class="num">2</span>*node+<span class="num">2</span>,mid+<span class="num">1</span>,end);
+  }
+}`
+  },
+  {
+    id: 12, name: "Matrix / 2D Grid", slug: "matrix",
+    category: "Strongly Expected",
+    tagType: "strong",
+    subtitle: "BFS/DFS on Grid · Shortest Path",
+    complexity: [
+      { op: "BFS/DFS", val: "O(m·n)", cls: "orange" },
+      { op: "Access", val: "O(1)" },
+      { op: "Dijkstra", val: "O(mn log mn)", cls: "orange" },
+      { op: "Space", val: "O(m·n)", cls: "orange" },
+    ],
+    useCases: [
+      { title: "Shortest Path", desc: "BFS for 0-1 weights, Dijkstra for varied" },
+      { title: "Word Search", desc: "DFS with backtracking on grid" },
+      { title: "Rotting Oranges", desc: "Multi-source BFS" },
+    ],
+    code: `<span class="kw">const</span> DIRS = [[-<span class="num">1</span>,<span class="num">0</span>],[<span class="num">1</span>,<span class="num">0</span>],[<span class="num">0</span>,-<span class="num">1</span>],[<span class="num">0</span>,<span class="num">1</span>]];
+
+<span class="cm">// ── Shortest Path in Grid (BFS) ───────────────────</span>
+<span class="kw">function</span> <span class="fn">shortestPath</span>(grid) {
+  <span class="kw">const</span> m=grid.length, n=grid[<span class="num">0</span>].length;
+  <span class="kw">if</span> (grid[<span class="num">0</span>][<span class="num">0</span>] || grid[m-<span class="num">1</span>][n-<span class="num">1</span>]) <span class="kw">return</span> -<span class="num">1</span>;
+  <span class="kw">const</span> dist = <span class="cls">Array</span>.from({length:m},()=><span class="kw">new</span> <span class="cls">Array</span>(n).fill(Infinity));
+  dist[<span class="num">0</span>][<span class="num">0</span>]=<span class="num">1</span>;
+  <span class="kw">const</span> q = [[<span class="num">0</span>,<span class="num">0</span>]];
+  <span class="kw">while</span>(q.length) {
+    <span class="kw">const</span> [r,c] = q.shift();
+    <span class="kw">if</span>(r===m-<span class="num">1</span>&&c===n-<span class="num">1</span>) <span class="kw">return</span> dist[r][c];
+    <span class="kw">for</span>(<span class="kw">const</span> [dr,dc] <span class="kw">of</span> [...DIRS,[-<span class="num">1</span>,-<span class="num">1</span>],[-<span class="num">1</span>,<span class="num">1</span>],[<span class="num">1</span>,-<span class="num">1</span>],[<span class="num">1</span>,<span class="num">1</span>]]){
+      <span class="kw">const</span> nr=r+dr, nc=c+dc;
+      <span class="kw">if</span>(nr>=<span class="num">0</span>&&nr<m&&nc>=<span class="num">0</span>&&nc<n&&!grid[nr][nc]&&dist[nr][nc]>dist[r][c]+<span class="num">1</span>){
+        dist[nr][nc]=dist[r][c]+<span class="num">1</span>; q.push([nr,nc]);
+      }
+    }
+  }
+  <span class="kw">return</span> -<span class="num">1</span>;
+}
+
+<span class="cm">// ── Word Search (DFS + Backtrack) ─────────────────</span>
+<span class="kw">function</span> <span class="fn">wordSearch</span>(board, word) {
+  <span class="kw">const</span> m=board.length, n=board[<span class="num">0</span>].length;
+  <span class="kw">const</span> <span class="fn">dfs</span> = (r, c, i) => {
+    <span class="kw">if</span> (i===word.length) <span class="kw">return true</span>;
+    <span class="kw">if</span> (r<<span class="num">0</span>||r>=m||c<<span class="num">0</span>||c>=n||board[r][c]!==word[i]) <span class="kw">return false</span>;
+    <span class="kw">const</span> tmp=board[r][c]; board[r][c]=<span class="str">'#'</span>; <span class="cm">// mark visited</span>
+    <span class="kw">const</span> found=DIRS.some(([dr,dc])=><span class="fn">dfs</span>(r+dr,c+dc,i+<span class="num">1</span>));
+    board[r][c]=tmp; <span class="cm">// restore</span>
+    <span class="kw">return</span> found;
+  };
+  <span class="kw">for</span>(<span class="kw">let</span> r=<span class="num">0</span>;r<m;r++)
+    <span class="kw">for</span>(<span class="kw">let</span> c=<span class="num">0</span>;c<n;c++)
+      <span class="kw">if</span>(<span class="fn">dfs</span>(r,c,<span class="num">0</span>)) <span class="kw">return true</span>;
+  <span class="kw">return false</span>;
+}`
+  },
+  {
+    id: 13, name: "LRU Cache", slug: "lru",
+    category: "Differentiator",
+    tagType: "diff",
+    subtitle: "HashMap + Doubly Linked List",
+    complexity: [
+      { op: "Get", val: "O(1)" },
+      { op: "Put", val: "O(1)" },
+      { op: "Evict", val: "O(1)" },
+      { op: "Space", val: "O(capacity)", cls: "orange" },
+    ],
+    useCases: [
+      { title: "Cache Layer", desc: "Browser cache, CPU cache simulation" },
+      { title: "System Design", desc: "Core to almost every cache question" },
+      { title: "Session Store", desc: "Fixed-size session management" },
+    ],
+    code: `<span class="kw">class</span> <span class="cls">LRUCache</span> {
+  <span class="fn">constructor</span>(capacity) {
+    <span class="kw">this</span>.capacity = capacity;
+    <span class="kw">this</span>.map = <span class="kw">new</span> <span class="cls">Map</span>(); <span class="cm">// key → node</span>
+    <span class="cm">// Dummy head & tail for O(1) removal</span>
+    <span class="kw">this</span>.head = { key:<span class="kw">null</span>, val:<span class="kw">null</span>, prev:<span class="kw">null</span>, next:<span class="kw">null</span> };
+    <span class="kw">this</span>.tail = { key:<span class="kw">null</span>, val:<span class="kw">null</span>, prev:<span class="kw">null</span>, next:<span class="kw">null</span> };
+    <span class="kw">this</span>.head.next = <span class="kw">this</span>.tail;
+    <span class="kw">this</span>.tail.prev = <span class="kw">this</span>.head;
+  }
+  <span class="fn">_remove</span>(node) {
+    node.prev.next = node.next;
+    node.next.prev = node.prev;
+  }
+  <span class="fn">_insertFront</span>(node) {
+    node.next = <span class="kw">this</span>.head.next;
+    node.prev = <span class="kw">this</span>.head;
+    <span class="kw">this</span>.head.next.prev = node;
+    <span class="kw">this</span>.head.next = node;
+  }
+  <span class="fn">get</span>(key) {
+    <span class="kw">if</span> (!<span class="kw">this</span>.map.has(key)) <span class="kw">return</span> -<span class="num">1</span>;
+    <span class="kw">const</span> node = <span class="kw">this</span>.map.get(key);
+    <span class="kw">this</span>.<span class="fn">_remove</span>(node);
+    <span class="kw">this</span>.<span class="fn">_insertFront</span>(node);
+    <span class="kw">return</span> node.val;
+  }
+  <span class="fn">put</span>(key, val) {
+    <span class="kw">if</span> (<span class="kw">this</span>.map.has(key)) <span class="kw">this</span>.<span class="fn">_remove</span>(<span class="kw">this</span>.map.get(key));
+    <span class="kw">const</span> node = { key, val, prev:<span class="kw">null</span>, next:<span class="kw">null</span> };
+    <span class="kw">this</span>.map.set(key, node);
+    <span class="kw">this</span>.<span class="fn">_insertFront</span>(node);
+    <span class="kw">if</span> (<span class="kw">this</span>.map.size > <span class="kw">this</span>.capacity) {
+      <span class="kw">const</span> lru = <span class="kw">this</span>.tail.prev;
+      <span class="kw">this</span>.<span class="fn">_remove</span>(lru);
+      <span class="kw">this</span>.map.delete(lru.key);
+    }
+  }
+}`
+  },
+  {
+    id: 14, name: "Deque", slug: "deque",
+    category: "Differentiator",
+    tagType: "diff",
+    subtitle: "Sliding Window Maximum · Monotonic Deque",
+    complexity: [
+      { op: "Push Front", val: "O(1)" },
+      { op: "Push Back", val: "O(1)" },
+      { op: "Pop Front", val: "O(1)" },
+      { op: "Pop Back", val: "O(1)" },
+    ],
+    useCases: [
+      { title: "Sliding Window Max", desc: "O(n) using monotonic deque" },
+      { title: "Jump Game VI", desc: "DP with deque optimization" },
+      { title: "BFS Variations", desc: "0-1 BFS, deque for priority" },
+    ],
+    code: `<span class="cm">// ── Sliding Window Maximum (Classic Google Problem) </span>
+<span class="kw">function</span> <span class="fn">maxSlidingWindow</span>(nums, k) {
+  <span class="kw">const</span> deque = []; <span class="cm">// stores indices, decreasing values</span>
+  <span class="kw">const</span> result = [];
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < nums.length; i++) {
+    <span class="cm">// Remove indices outside window</span>
+    <span class="kw">while</span> (deque.length && deque[<span class="num">0</span>] < i - k + <span class="num">1</span>) deque.shift();
+    <span class="cm">// Maintain decreasing order</span>
+    <span class="kw">while</span> (deque.length && nums[deque.at(-<span class="num">1</span>)] < nums[i]) deque.pop();
+    deque.push(i);
+    <span class="kw">if</span> (i >= k - <span class="num">1</span>) result.push(nums[deque[<span class="num">0</span>]]);
+  }
+  <span class="kw">return</span> result;
+}
+
+<span class="cm">// ── Deque class (when needed) ─────────────────────</span>
+<span class="kw">class</span> <span class="cls">Deque</span> {
+  <span class="fn">constructor</span>() { <span class="kw">this</span>.data = {}; <span class="kw">this</span>.front = <span class="num">0</span>; <span class="kw">this</span>.back = <span class="num">0</span>; }
+  <span class="fn">pushFront</span>(v) { <span class="kw">this</span>.data[--<span class="kw">this</span>.front] = v; }
+  <span class="fn">pushBack</span>(v)  { <span class="kw">this</span>.data[<span class="kw">this</span>.back++] = v; }
+  <span class="fn">popFront</span>()   { <span class="kw">return this</span>.data[<span class="kw">this</span>.front++]; }
+  <span class="fn">popBack</span>()    { <span class="kw">return this</span>.data[--<span class="kw">this</span>.back]; }
+  <span class="fn">peekFront</span>()  { <span class="kw">return this</span>.data[<span class="kw">this</span>.front]; }
+  <span class="fn">peekBack</span>()   { <span class="kw">return this</span>.data[<span class="kw">this</span>.back-<span class="num">1</span>]; }
+  <span class="fn">size</span>()        { <span class="kw">return this</span>.back - <span class="kw">this</span>.front; }
+  <span class="fn">isEmpty</span>()     { <span class="kw">return this</span>.back === <span class="kw">this</span>.front; }
+}`
+  },
+  {
+    id: 15, name: "Sorted List / Multiset", slug: "sortedlist",
+    category: "Differentiator",
+    tagType: "diff",
+    subtitle: "Median Finder · Order Statistics",
+    complexity: [
+      { op: "Insert", val: "O(log n)" },
+      { op: "Delete", val: "O(log n)" },
+      { op: "Median", val: "O(1)" },
+      { op: "Rank", val: "O(log n)" },
+    ],
+    useCases: [
+      { title: "Sliding Median", desc: "Median of each window" },
+      { title: "Data Stream", desc: "Find median from data stream" },
+      { title: "Rank K", desc: "Kth smallest in stream" },
+    ],
+    code: `<span class="cm">// ── Find Median from Data Stream ──────────────────</span>
+<span class="cm">// Two Heaps approach: maxHeap(low) + minHeap(high)</span>
+<span class="kw">class</span> <span class="cls">MedianFinder</span> {
+  <span class="fn">constructor</span>() {
+    <span class="kw">this</span>.low  = <span class="kw">new</span> <span class="cls">MaxHeap</span>(); <span class="cm">// smaller half</span>
+    <span class="kw">this</span>.high = <span class="kw">new</span> <span class="cls">MinHeap</span>(); <span class="cm">// larger half</span>
+  }
+  <span class="fn">addNum</span>(num) {
+    <span class="kw">this</span>.low.<span class="fn">push</span>(num);
+    <span class="kw">this</span>.high.<span class="fn">push</span>(<span class="kw">this</span>.low.<span class="fn">pop</span>()); <span class="cm">// rebalance</span>
+    <span class="kw">if</span> (<span class="kw">this</span>.low.<span class="fn">size</span>() < <span class="kw">this</span>.high.<span class="fn">size</span>())
+      <span class="kw">this</span>.low.<span class="fn">push</span>(<span class="kw">this</span>.high.<span class="fn">pop</span>());
+  }
+  <span class="fn">findMedian</span>() {
+    <span class="kw">return this</span>.low.<span class="fn">size</span>() > <span class="kw">this</span>.high.<span class="fn">size</span>()
+      ? <span class="kw">this</span>.low.<span class="fn">peek</span>()
+      : (<span class="kw">this</span>.low.<span class="fn">peek</span>() + <span class="kw">this</span>.high.<span class="fn">peek</span>()) / <span class="num">2</span>;
+  }
+}
+
+<span class="cm">// ── Sliding Window Median (Two Heaps) ─────────────</span>
+<span class="kw">function</span> <span class="fn">slidingWindowMedian</span>(nums, k) {
+  <span class="cm">// Use balanced two-heap structure</span>
+  <span class="cm">// For each window: add new, remove outgoing, get median</span>
+  <span class="cm">// JS doesn't have native sorted multiset—simulate with heaps</span>
+  <span class="kw">const</span> result = [];
+  <span class="kw">const</span> mf = <span class="kw">new</span> <span class="cls">MedianFinder</span>();
+  <span class="kw">for</span> (<span class="kw">let</span> i=<span class="num">0</span>; i<nums.length; i++) {
+    mf.<span class="fn">addNum</span>(nums[i]);
+    <span class="kw">if</span> (i >= k-<span class="num">1</span>) {
+      result.push(mf.<span class="fn">findMedian</span>());
+      <span class="cm">// Note: full impl needs lazy deletion for outgoing element</span>
+    }
+  }
+  <span class="kw">return</span> result;
+}`
+  },
+  {
+    id: 16, name: "Interval Tree", slug: "interval",
+    category: "Differentiator",
+    tagType: "diff",
+    subtitle: "Merge · Insert · Overlap Detection",
+    complexity: [
+      { op: "Merge", val: "O(n log n)" },
+      { op: "Insert", val: "O(n)" },
+      { op: "Overlap", val: "O(log n)" },
+      { op: "Space", val: "O(n)", cls: "orange" },
+    ],
+    useCases: [
+      { title: "Calendar App", desc: "Detect conflicting meetings" },
+      { title: "Meeting Rooms", desc: "Min rooms needed" },
+      { title: "Employee Free Time", desc: "Merge schedules, find gaps" },
+    ],
+    code: `<span class="cm">// ── Merge Intervals ───────────────────────────────</span>
+<span class="kw">function</span> <span class="fn">merge</span>(intervals) {
+  intervals.sort((a,b) => a[<span class="num">0</span>]-b[<span class="num">0</span>]);
+  <span class="kw">const</span> res = [intervals[<span class="num">0</span>]];
+  <span class="kw">for</span> (<span class="kw">const</span> [s,e] <span class="kw">of</span> intervals.slice(<span class="num">1</span>)) {
+    <span class="kw">const</span> last = res.at(-<span class="num">1</span>);
+    <span class="kw">if</span> (s <= last[<span class="num">1</span>]) last[<span class="num">1</span>] = Math.max(last[<span class="num">1</span>], e);
+    <span class="kw">else</span> res.push([s, e]);
+  }
+  <span class="kw">return</span> res;
+}
+
+<span class="cm">// ── Insert Interval ───────────────────────────────</span>
+<span class="kw">function</span> <span class="fn">insert</span>(intervals, newInterval) {
+  <span class="kw">const</span> res = [];
+  <span class="kw">let</span> i = <span class="num">0</span>, [s, e] = newInterval;
+  <span class="kw">while</span> (i<intervals.length && intervals[i][<span class="num">1</span>]<s) res.push(intervals[i++]);
+  <span class="kw">while</span> (i<intervals.length && intervals[i][<span class="num">0</span>]<=e) {
+    s = Math.min(s, intervals[i][<span class="num">0</span>]);
+    e = Math.max(e, intervals[i][<span class="num">1</span>]);
+    i++;
+  }
+  res.push([s,e]);
+  <span class="kw">while</span> (i<intervals.length) res.push(intervals[i++]);
+  <span class="kw">return</span> res;
+}
+
+<span class="cm">// ── Minimum Meeting Rooms ─────────────────────────</span>
+<span class="kw">function</span> <span class="fn">minMeetingRooms</span>(intervals) {
+  <span class="kw">const</span> starts = intervals.map(i=>i[<span class="num">0</span>]).sort((a,b)=>a-b);
+  <span class="kw">const</span> ends   = intervals.map(i=>i[<span class="num">1</span>]).sort((a,b)=>a-b);
+  <span class="kw">let</span> rooms=<span class="num">0</span>, j=<span class="num">0</span>;
+  <span class="kw">for</span> (<span class="kw">let</span> i=<span class="num">0</span>;i<starts.length;i++) {
+    starts[i] < ends[j] ? rooms++ : j++;
+  }
+  <span class="kw">return</span> rooms;
+}`
+  },
+];
+
+const categoryOrder = ["Must Know Cold", "Strongly Expected", "Differentiator"];
+const navEl = document.getElementById('nav');
+const mainEl = document.getElementById('main');
+
+// Build nav
+const groups = {};
+for (const s of structures) {
+  if (!groups[s.category]) groups[s.category] = [];
+  groups[s.category].push(s);
+}
+
+for (const cat of categoryOrder) {
+  if (!groups[cat]) continue;
+  const g = document.createElement('div');
+  g.className = 'nav-group';
+  const label = document.createElement('div');
+  label.className = 'nav-label';
+  label.textContent = cat;
+  g.appendChild(label);
+  for (const s of groups[cat]) {
+    const item = document.createElement('div');
+    item.className = 'nav-item';
+    item.dataset.id = s.id;
+    item.innerHTML = `<span class="num">${String(s.id).padStart(2,'0')}</span>${s.name}`;
+    item.addEventListener('click', () => showDS(s.id));
+    g.appendChild(item);
+  }
+  navEl.appendChild(g);
+}
+
+// Build cards
+for (const s of structures) {
+  const tagClass = s.tagType === 'must' ? 'tag-must' : s.tagType === 'strong' ? 'tag-strong' : 'tag-diff';
+  const tagLabel = s.tagType === 'must' ? '✦ Must Know' : s.tagType === 'strong' ? '◈ Strongly Expected' : '◆ Differentiator';
+
+  const complexityHTML = s.complexity.map(c =>
+    `<div class="complexity-box"><div class="op">${c.op}</div><div class="val ${c.cls||''}">${c.val}</div></div>`
+  ).join('');
+
+  const useCasesHTML = s.useCases.map(u =>
+    `<div class="use-case"><strong>${u.title}</strong>${u.desc}</div>`
+  ).join('');
+
+  const card = document.createElement('div');
+  card.className = 'ds-card';
+  card.id = `card-${s.id}`;
+  card.innerHTML = `
+    <div class="card-header">
+      <div class="card-num">${String(s.id).padStart(2,'0')}</div>
+      <div>
+        <div class="card-title">${s.name}<small>${s.subtitle}</small></div>
+        <div class="tags"><span class="tag ${tagClass}">${tagLabel}</span></div>
+      </div>
+    </div>
+    <div class="section-title">Time Complexity</div>
+    <div class="complexity-grid">${complexityHTML}</div>
+    <div class="section-title">Common Use Cases</div>
+    <div class="use-cases">${useCasesHTML}</div>
+    <div class="section-title">Implementation</div>
+    <pre><button class="copy-btn" onclick="copyCode(this)">copy</button><code>${s.code}</code></pre>
+  `;
+  mainEl.appendChild(card);
+}
+
+function showDS(id) {
+  document.querySelectorAll('.ds-card').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`card-${id}`).classList.add('active');
+  document.querySelector(`.nav-item[data-id="${id}"]`).classList.add('active');
+}
+
+function copyCode(btn) {
+  const code = btn.nextElementSibling.innerText;
+  navigator.clipboard.writeText(code).then(() => {
+    btn.textContent = 'copied!';
+    setTimeout(() => btn.textContent = 'copy', 1500);
+  });
+}
+
+showDS(1);
+</script>
+</body>
+</html>
