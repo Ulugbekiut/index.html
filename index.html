@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PM Interview — Most Asked Q&A</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f5f0e8;
+    --warm: #ede7d9;
+    --ink: #1a1410;
+    --muted: #7a6f63;
+    --accent: #c84b2f;
+    --accent2: #2f6bc8;
+    --gold: #b8860b;
+    --border: #d4c9b8;
+    --surface: #ffffff;
+    --tag-bg: #f0ece4;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 56px 48px 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200,75,47,0.25), transparent 70%);
+  }
+  header::after {
+    content: '"';
+    position: absolute;
+    bottom: -40px; right: 48px;
+    font-family: 'Playfair Display', serif;
+    font-size: 220px;
+    color: rgba(255,255,255,0.04);
+    line-height: 1;
+    pointer-events: none;
+  }
+  .header-label {
+    font-size: 0.7rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 5vw, 4rem);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -1px;
+    margin-bottom: 16px;
+  }
+  header h1 em { color: var(--accent); font-style: italic; }
+  header p { color: rgba(245,240,232,0.6); font-size: 0.9rem; max-width: 500px; line-height: 1.6; }
+
+  /* ── Filters ── */
+  .filters {
+    padding: 24px 48px;
+    background: var(--warm);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .filter-label { font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-right: 4px; }
+  .filter-btn {
+    padding: 7px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+  .filter-btn:hover { border-color: var(--ink); color: var(--ink); }
+  .filter-btn.active { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+
+  /* ── Layout ── */
+  .layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: calc(100vh - 220px);
+  }
+
+  /* ── Sidebar ── */
+  aside {
+    border-right: 1px solid var(--border);
+    padding: 28px 0;
+    position: sticky;
+    top: 0;
+    height: calc(100vh - 220px);
+    overflow-y: auto;
+    background: var(--warm);
+  }
+  aside::-webkit-scrollbar { width: 3px; }
+  aside::-webkit-scrollbar-thumb { background: var(--border); }
+  .aside-section { margin-bottom: 8px; }
+  .aside-cat {
+    font-size: 0.62rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 12px 24px 6px;
+    font-weight: 500;
+  }
+  .aside-item {
+    padding: 10px 24px;
+    cursor: pointer;
+    font-size: 0.83rem;
+    color: var(--muted);
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    line-height: 1.3;
+  }
+  .aside-item:hover { color: var(--ink); background: rgba(255,255,255,0.5); }
+  .aside-item.active { color: var(--ink); border-left-color: var(--accent); background: rgba(255,255,255,0.7); font-weight: 500; }
+  .aside-item .qnum {
+    font-size: 0.68rem;
+    color: var(--border);
+    min-width: 20px;
+    text-align: right;
+    font-weight: 400;
+  }
+  .aside-item.active .qnum { color: var(--accent); }
+
+  /* ── Main content ── */
+  main {
+    padding: 48px 56px;
+    overflow-y: auto;
+  }
+
+  .q-card {
+    display: none;
+    animation: slideIn 0.35s ease;
+  }
+  .q-card.active { display: block; }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-header { margin-bottom: 36px; }
+  .q-meta {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .q-cat-tag {
+    font-size: 0.68rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 3px;
+    font-weight: 600;
+  }
+  .cat-behavioral { background: #fef3cd; color: #856404; }
+  .cat-product { background: #cfe2ff; color: #084298; }
+  .cat-strategy { background: #d1e7dd; color: #0a3622; }
+  .cat-analytical { background: #f8d7da; color: #842029; }
+  .cat-execution { background: #e2d9f3; color: #432874; }
+
+  .freq-badge {
+    font-size: 0.68rem;
+    padding: 4px 10px;
+    border-radius: 3px;
+    background: var(--tag-bg);
+    color: var(--muted);
+    border: 1px solid var(--border);
+    font-weight: 500;
+  }
+  .freq-badge.high { background: rgba(200,75,47,0.1); color: var(--accent); border-color: rgba(200,75,47,0.3); }
+
+  .q-question {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .q-note {
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 32px;
+  }
+
+  /* ── Framework box ── */
+  .framework-box {
+    background: var(--ink);
+    color: var(--cream);
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .framework-icon { font-size: 1.4rem; margin-top: 2px; }
+  .framework-name {
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .framework-steps {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .framework-step {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 0.78rem;
+    color: rgba(245,240,232,0.85);
+  }
+  .framework-step strong { color: var(--cream); }
+
+  /* ── Answer sections ── */
+  .answer-block {
+    margin-bottom: 28px;
+  }
+  .answer-block h3 {
+    font-size: 0.68rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+  }
+  .answer-text {
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: #2a2420;
+  }
+
+  .bullet-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .bullet-list li {
+    display: flex;
+    gap: 12px;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: #2a2420;
+  }
+  .bullet-list li::before {
+    content: '→';
+    color: var(--accent);
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── Example answer ── */
+  .example-answer {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent2);
+    border-radius: 8px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+    position: relative;
+  }
+  .example-answer::before {
+    content: 'SAMPLE ANSWER';
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    background: var(--accent2);
+    color: white;
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    padding: 3px 10px;
+    border-radius: 3px;
+    font-weight: 700;
+  }
+  .example-answer p {
+    font-size: 0.88rem;
+    line-height: 1.8;
+    color: #2a2420;
+    font-style: italic;
+  }
+  .example-answer p + p { margin-top: 12px; }
+
+  /* ── Pitfalls ── */
+  .pitfalls {
+    background: rgba(200,75,47,0.06);
+    border: 1px solid rgba(200,75,47,0.2);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 28px;
+  }
+  .pitfalls h3 {
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+    font-weight: 700;
+  }
+  .pitfalls ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .pitfalls ul li {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: #5a2a20;
+    display: flex;
+    gap: 10px;
+  }
+  .pitfalls ul li::before { content: '✕'; color: var(--accent); font-weight: 700; }
+
+  /* ── Pro tip ── */
+  .pro-tip {
+    background: rgba(184,134,11,0.08);
+    border: 1px solid rgba(184,134,11,0.25);
+    border-radius: 8px;
+    padding: 16px 20px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .pro-tip .tip-icon { font-size: 1.1rem; }
+  .pro-tip p { font-size: 0.85rem; line-height: 1.6; color: #5a4a00; }
+  .pro-tip strong { color: var(--gold); }
+
+  /* ── Nav arrows ── */
+  .q-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 32px 0 0;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+  }
+  .nav-arrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    color: var(--muted);
+    padding: 10px 16px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .nav-arrow:hover { border-color: var(--ink); color: var(--ink); }
+  .nav-arrow:disabled { opacity: 0.3; cursor: not-allowed; }
+  .q-counter { font-size: 0.8rem; color: var(--muted); }
+
+  @media (max-width: 768px) {
+    header { padding: 36px 24px; }
+    .filters { padding: 16px 24px; }
+    .layout { grid-template-columns: 1fr; }
+    aside { position: static; height: auto; display: flex; overflow-x: auto; border-right: none; border-bottom: 1px solid var(--border); padding: 12px 0; }
+    .aside-section { display: flex; min-width: max-content; }
+    .aside-cat { display: none; }
+    .aside-item { white-space: nowrap; border-left: none; border-bottom: 3px solid transparent; padding: 8px 16px; }
+    .aside-item.active { border-bottom-color: var(--accent); border-left-color: transparent; }
+    main { padding: 28px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-label">Interview Preparation Guide</div>
+  <h1>Product Manager<br><em>Interview Q&A</em></h1>
+  <p>25 most-asked questions with structured answers, frameworks, and sample responses.</p>
+</header>
+
+<div class="filters">
+  <span class="filter-label">Filter:</span>
+  <button class="filter-btn active" data-filter="all">All Questions</button>
+  <button class="filter-btn" data-filter="behavioral">Behavioral</button>
+  <button class="filter-btn" data-filter="product">Product Design</button>
+  <button class="filter-btn" data-filter="strategy">Strategy</button>
+  <button class="filter-btn" data-filter="analytical">Analytical</button>
+  <button class="filter-btn" data-filter="execution">Execution</button>
+</div>
+
+<div class="layout">
+  <aside id="sidebar"></aside>
+  <main id="main"></main>
+</div>
+
+<script>
+const questions = [
+  {
+    id: 1, cat: "behavioral", catLabel: "Behavioral",
+    freq: "high",
+    q: "Tell me about yourself.",
+    note: "This is almost always the opening question. It sets the tone for the entire interview.",
+    framework: { name: "Present–Past–Future", steps: ["Current Role", "Key Achievements", "Why PM", "Why This Company"] },
+    keyPoints: [
+      "Keep it under 2 minutes — interviewers lose interest fast",
+      "Connect your background directly to product thinking",
+      "End with why you want THIS specific PM role",
+      "Quantify impact wherever possible"
+    ],
+    sample: [
+      "I'm currently a product manager at [Company], where I own our mobile checkout experience used by 12 million monthly users. In the past year my team shipped a one-tap checkout flow that reduced cart abandonment by 23%.",
+      "Before that I was a software engineer, which gives me a natural advantage in technical conversations with engineering teams — I can translate product requirements into implementation details without a game of telephone.",
+      "I'm here because I want to move from consumer fintech into B2B SaaS. Your platform sits at an intersection I find genuinely fascinating — workflow automation for mid-market ops teams — and the scale challenges at your growth stage are exactly where I want to build."
+    ],
+    pitfalls: [
+      "Reciting your entire resume chronologically — that's what the resume is for",
+      "Being vague: 'I've always been passionate about products' tells them nothing",
+      "Forgetting to connect your story to why you want their specific role"
+    ],
+    tip: "Prepare 3 versions: 60-second, 90-second, 2-minute. Match length to the interviewer's energy."
+  },
+  {
+    id: 2, cat: "product", catLabel: "Product Design",
+    freq: "high",
+    q: "Design a product for [X demographic / problem].",
+    note: "e.g. 'Design a product for elderly users', 'Design an alarm clock for the blind'",
+    framework: { name: "Product Design Framework", steps: ["Clarify Scope", "Define Users", "Pain Points", "Prioritize", "Solution", "Metrics", "Trade-offs"] },
+    keyPoints: [
+      "Always start by clarifying the goal and constraints — never jump to solutions",
+      "Segment users meaningfully, then pick ONE primary persona to focus on",
+      "Prioritize pain points by frequency × severity",
+      "Propose 2-3 solutions, evaluate trade-offs, then recommend one",
+      "Define success metrics before wrapping up"
+    ],
+    sample: [
+      "Before designing anything, let me clarify scope. Are we building a new standalone product or a feature within an existing platform? And is there a specific business model in mind — consumer, B2B, marketplace?",
+      "Assuming a new consumer product: I'd segment elderly users into three groups — tech-comfortable seniors (60-70, smartphone users), tech-reluctant seniors (70+, prefers simplicity), and caregivers who manage their loved ones' needs. I'd focus on the middle group because they have the highest unmet need and the lowest digital support.",
+      "Their top pain points: medication management is missed or double-taken, isolation and lack of social connection, and friction in contacting family. I'd prioritize medication management — it's the most frequent and highest severity issue with real health consequences.",
+      "My solution: a simplified medication reminder app with large text, voice confirmation, and a family dashboard so adult children get alerts if a dose is missed. Success metrics: DAU of medication logging, reduction in missed doses (self-reported), and caregiver satisfaction score."
+    ],
+    pitfalls: [
+      "Jumping straight to your solution without asking clarifying questions",
+      "Designing for yourself instead of the actual user segment",
+      "Forgetting to define metrics — every product answer needs success criteria",
+      "Only proposing one solution with no trade-off analysis"
+    ],
+    tip: "Interviewers don't expect the 'right' answer — they're evaluating your structured thinking process. Narrate your reasoning out loud."
+  },
+  {
+    id: 3, cat: "strategy", catLabel: "Strategy",
+    freq: "high",
+    q: "How would you improve our product?",
+    note: "Research the company deeply before this one. Vague answers here are a red flag.",
+    framework: { name: "Improve Framework", steps: ["Current State", "User Segments", "Pain Points", "Prioritize", "Proposals", "Metrics"] },
+    keyPoints: [
+      "Do real research before the interview — use the product yourself",
+      "Start with user segments, not features",
+      "Show you understand the business model and how your improvement ties to revenue or retention",
+      "Be specific: 'improve onboarding' is weak; 'reduce time-to-first-value from 14 minutes to 3 minutes' is strong"
+    ],
+    sample: [
+      "I've spent time using the product over the past week and talked to a few people in your target segment. A few observations: the onboarding flow requires 7 steps before users see any value, which I believe is contributing to early drop-off. Based on similar B2B SaaS patterns, activation likely drops significantly after step 3.",
+      "I'd focus on the new user segment specifically, because improving activation is a multiplier on every other growth metric. My proposed improvement: introduce a 'quick win' moment at step 2 — show a pre-populated demo project using the user's own company data pulled from their CRM at signup. This gives users an 'aha moment' much earlier.",
+      "I'd measure success by: time-to-first-action, 7-day retention rate, and feature adoption depth at day 30. If the quick-win moment reduces time-to-first-action by 40%, I'd expect a 15-20% lift in 7-day retention based on industry benchmarks."
+    ],
+    pitfalls: [
+      "Criticizing the product harshly without framing it as opportunity",
+      "Proposing features without tying them to user pain points or business outcomes",
+      "Being generic: 'better UI' or 'more features' signals you haven't actually used the product"
+    ],
+    tip: "Lead with what the product does well — then pivot to opportunity. Interviewers built this product and have feelings about it."
+  },
+  {
+    id: 4, cat: "analytical", catLabel: "Analytical",
+    freq: "high",
+    q: "A key metric dropped 20% last week. How do you investigate?",
+    note: "Classic metric investigation question. Interviewers want systematic thinking, not guessing.",
+    framework: { name: "Metric Diagnosis Framework", steps: ["Confirm Data", "Segment", "Time", "Platform", "Internal/External", "Hypothesis", "Action"] },
+    keyPoints: [
+      "Never jump to a hypothesis first — validate the data before anything",
+      "Segment by every dimension: geography, platform, user cohort, device",
+      "Check for internal causes before external (code deploy, experiment, data pipeline)",
+      "Always have a 'so what' — what action does the investigation lead to?"
+    ],
+    sample: [
+      "First I'd verify the data is accurate — check if there's a logging error, a dashboard bug, or a data pipeline failure. A 20% drop that's real is a serious incident; a 20% drop from a broken tracking pixel is a completely different problem.",
+      "Assuming the data is correct, I'd segment the drop: Is it global or specific to a region? Mobile or desktop? New users or returning? A specific funnel step? If the drop is isolated — say, only iOS in North America — that points to a recent app release or a platform-level issue.",
+      "Then I'd check internal causes: Was there a code deployment, a configuration change, or an A/B test launched last week? I'd look at the timeline of changes against the metric decline. If no internal cause, I'd look externally — competitor launch, press coverage, seasonality.",
+      "Finally I'd synthesize a top hypothesis, design a quick validation test, and communicate status to stakeholders with an estimated timeline for resolution."
+    ],
+    pitfalls: [
+      "Immediately jumping to 'it was the new feature we shipped' without validating data first",
+      "Forgetting to check for instrumentation / tracking errors",
+      "Investigating in isolation — this should involve data, engineering, and design"
+    ],
+    tip: "Structure your investigation as a funnel: data validity → segment → time → internal cause → external cause. Never skip steps."
+  },
+  {
+    id: 5, cat: "behavioral", catLabel: "Behavioral",
+    freq: "high",
+    q: "Tell me about a time you made a decision with incomplete data.",
+    note: "Tests your comfort with ambiguity — a core PM skill.",
+    framework: { name: "STAR Method", steps: ["Situation", "Task", "Action", "Result"] },
+    keyPoints: [
+      "Show that you acknowledged the data gap explicitly — you didn't pretend it wasn't there",
+      "Explain your decision-making framework under uncertainty",
+      "Quantify the outcome if possible",
+      "Reflect on what you'd do differently with more data"
+    ],
+    sample: [
+      "We were deciding whether to kill a feature that had low usage — about 3% of users — but we had no qualitative data on why those users used it or what would happen if we removed it. The team was pressuring for a fast call because it was adding maintenance overhead.",
+      "I proposed a two-week mini-research sprint before deciding. We ran 8 user interviews and found that the 3% of users were almost exclusively enterprise customers on our highest-tier plan — a segment representing 40% of revenue. They were using the feature daily as part of a workflow we didn't even know existed.",
+      "We decided not to kill the feature and instead invested in improving it. Six months later, that improved feature became a key selling point in enterprise sales conversations. The lesson: usage rate alone is a poor signal. Revenue concentration and workflow criticality matter more."
+    ],
+    pitfalls: [
+      "Choosing a story where you had plenty of data — it misses the point of the question",
+      "Not articulating how you made the decision under uncertainty",
+      "Skipping the reflection — 'what would I do differently' shows growth mindset"
+    ],
+    tip: "Pick a story where the incomplete data led to a non-obvious decision. Easy calls don't demonstrate PM judgment."
+  },
+  {
+    id: 6, cat: "strategy", catLabel: "Strategy",
+    freq: "high",
+    q: "How do you prioritize features when everything is urgent?",
+    note: "Tests your prioritization frameworks and stakeholder management skills.",
+    framework: { name: "Prioritization Options", steps: ["RICE Score", "ICE Framework", "MoSCoW", "Opportunity Scoring", "Story Mapping"] },
+    keyPoints: [
+      "Acknowledge that 'everything is urgent' is a signal of unclear strategy, not just workload",
+      "Explain how you align with business goals and user needs before scoring",
+      "Show you involve stakeholders in the process, not just impose a list",
+      "Mention that prioritization is ongoing, not a one-time exercise"
+    ],
+    sample: [
+      "When everything feels urgent, I start by going back to first principles: what is the most important outcome this team needs to drive in the next quarter? Usually 'everything is urgent' means we haven't tied features to a small set of clear goals.",
+      "Once I have that north star, I use a modified RICE framework — Reach, Impact, Confidence, Effort — to score the backlog. But I don't do this alone. I run a prioritization session with engineering leads, design, and key stakeholders so the scores reflect collective judgment, not just my intuition.",
+      "After scoring, I bucket items into: must-do this quarter, want-to-do if capacity allows, and deliberately parking. The parking list is visible to everyone — transparency prevents the 'you never told me' conversation later. I review and reorder the backlog every two weeks as new information comes in."
+    ],
+    pitfalls: [
+      "Saying 'I use RICE' without explaining how you apply it or adapt it",
+      "Not addressing the stakeholder conflict that usually drives the 'everything is urgent' situation",
+      "Treating prioritization as a solo PM activity"
+    ],
+    tip: "Name-dropping frameworks without context is worse than no framework. Always explain the tradeoffs of the framework you chose."
+  },
+  {
+    id: 7, cat: "behavioral", catLabel: "Behavioral",
+    freq: "high",
+    q: "Describe a time you disagreed with your engineering team.",
+    note: "Tests cross-functional collaboration and how you handle conflict with partners.",
+    framework: { name: "Conflict Resolution", steps: ["Context", "Disagreement", "Your Approach", "Resolution", "Outcome", "Relationship"] },
+    keyPoints: [
+      "Show respect for engineering expertise — you're a partner, not a boss",
+      "Demonstrate you sought to understand their concern before advocating for your position",
+      "Show the outcome benefited from the debate, not just your original idea",
+      "End with the relationship being stronger, not just the decision being made"
+    ],
+    sample: [
+      "We were shipping a new search feature and I wanted to launch with fuzzy matching — approximate string matching to handle typos. My engineering lead felt strongly that we didn't have the infrastructure to do it well in our timeline, and that a bad fuzzy match experience would be worse than no fuzzy match at all.",
+      "Instead of pushing back immediately, I asked her to walk me through the specific technical risks. She showed me that our current database queries would degrade significantly at scale with approximate matching. She was right — I hadn't fully accounted for the infrastructure constraint.",
+      "We agreed to launch with exact match and build a lightweight type-ahead autocorrect instead, which solved the core user pain without the infrastructure cost. The autocorrect had a 31% adoption rate in the first month. More importantly, my engineering lead and I built a stronger working relationship from that conversation — she now proactively loops me in on technical trade-offs early."
+    ],
+    pitfalls: [
+      "Telling a story where you were right and engineering was wrong — that's not collaboration",
+      "Showing that you steamrolled engineering to get your way",
+      "Skipping the relationship outcome — good PMs preserve trust even when they win the argument"
+    ],
+    tip: "The best answer shows that the disagreement made the final product better than either of your original positions."
+  },
+  {
+    id: 8, cat: "product", catLabel: "Product Design",
+    freq: "high",
+    q: "How would you build a product roadmap from scratch?",
+    note: "Tests your strategic planning ability and how you balance top-down vs. bottom-up input.",
+    framework: { name: "Roadmap Building", steps: ["Company Goals", "User Research", "Opportunity Areas", "Bets", "Prioritize", "Communicate"] },
+    keyPoints: [
+      "Start from company strategy down to product bets — not from a list of features",
+      "Distinguish between outcomes (what you want to achieve) and outputs (what you'll build)",
+      "Show you involve multiple sources: user research, sales feedback, data, competitive analysis",
+      "Explain how you communicate and maintain the roadmap, not just build it once"
+    ],
+    sample: [
+      "I start by aligning on company-level objectives for the period — typically OKRs or strategic pillars. From those, I identify 2-3 product bets that could meaningfully move the needle. A 'bet' is an outcome: 'Increase enterprise activation by 30%' not 'Build better onboarding.'",
+      "Then I research: user interviews with key segments, sales win/loss analysis, support ticket themes, competitive landscape, and my own product usage. I'm looking for opportunity areas — clusters of unmet user needs that align with business objectives.",
+      "From those opportunity areas, I define initiatives and then specific features or experiments. Each roadmap item has an owner, an expected outcome, a confidence level, and a time horizon. I use a now/next/later format rather than quarterly dates — it's more honest about uncertainty.",
+      "I share the roadmap with engineering, design, sales, and executive leadership before finalizing. The roadmap is a communication tool as much as a planning tool — if stakeholders are surprised, I've failed."
+    ],
+    pitfalls: [
+      "Building a feature list instead of an outcome-based roadmap",
+      "Not acknowledging that the roadmap will change — rigidity is a weakness",
+      "Skipping stakeholder alignment and just presenting a finished roadmap"
+    ],
+    tip: "A roadmap that answers 'why' for each item is 10x more valuable than one that only answers 'what.'"
+  },
+  {
+    id: 9, cat: "analytical", catLabel: "Analytical",
+    freq: "high",
+    q: "How would you measure the success of a new feature?",
+    note: "Tests your metrics thinking and understanding of product/business impact.",
+    framework: { name: "Metrics Framework", steps: ["Goal", "Primary Metric", "Secondary Metrics", "Guardrails", "Leading Indicators", "Timeline"] },
+    keyPoints: [
+      "Tie metrics to the stated goal of the feature, not just usage",
+      "Always include guardrail metrics to prevent gaming the primary metric",
+      "Distinguish between leading indicators (early signals) and lagging outcomes",
+      "Define measurement timeline — when do you make a go/no-go decision?"
+    ],
+    sample: [
+      "Let's say the feature is a collaborative commenting tool inside a B2B app. The stated goal is to improve team collaboration and reduce reliance on external tools like Slack or email.",
+      "Primary metric: 7-day feature retention — are teams using it regularly, not just once? Secondary metrics: comments per active user, threads with more than 2 participants (indicating real collaboration), and reduction in support tickets about 'team communication.' Guardrail metric: overall session length shouldn't decrease — the feature should add value without fragmenting the experience.",
+      "Leading indicator to watch in week 1: number of users who invite a colleague through the feature (invitation = intent to collaborate). If invitation rate is below 15%, the feature isn't driving collaboration even if comments are happening.",
+      "I'd do a 30-day read for primary metrics and a 90-day read for business impact metrics like expansion revenue in accounts using the feature."
+    ],
+    pitfalls: [
+      "Using only vanity metrics like page views or number of comments",
+      "Forgetting guardrail metrics — you could optimize a feature metric while hurting the product",
+      "Setting metrics after the feature ships — they need to be defined before"
+    ],
+    tip: "For every metric you propose, ask: 'Could someone game this metric without actually achieving the goal?' If yes, add a guardrail."
+  },
+  {
+    id: 10, cat: "strategy", catLabel: "Strategy",
+    freq: "high",
+    q: "How do you decide when to build vs. buy vs. partner?",
+    note: "Tests strategic thinking, resource awareness, and competitive analysis.",
+    framework: { name: "Build/Buy/Partner", steps: ["Core vs. Context", "Time to Market", "Cost", "Control", "Competitive Moat", "Recommendation"] },
+    keyPoints: [
+      "Build when it's a core competency or creates competitive differentiation",
+      "Buy when you need capability fast and the market has mature solutions",
+      "Partner when you need distribution or complementary capability without full integration",
+      "Always consider maintenance cost and vendor lock-in risk"
+    ],
+    sample: [
+      "I use a core-vs-context framework first. If the capability is central to our competitive differentiation — something users choose us for — I lean toward building. If it's a commodity capability that users expect but don't choose us for, I lean toward buy or partner.",
+      "For example: if we're a fintech app, building our own payment rails is probably too slow and expensive. Buying Stripe integration is the right call. But our fraud detection model might be a core competency worth building — it's a differentiator that gets better as we accumulate proprietary data.",
+      "Factors that push toward buy: timeline pressure, no existing internal expertise, commodity capability. Factors that push toward build: unique data advantage, need for tight product integration, long-term competitive moat. Partner makes sense when we need distribution or complementary capability but not full ownership — like an API integration with a data provider."
+    ],
+    pitfalls: [
+      "Always defaulting to build because 'we can do it better' — that's overconfidence",
+      "Ignoring total cost of ownership: buying has licensing costs, building has maintenance costs",
+      "Not considering reversibility — some build decisions are very hard to undo"
+    ],
+    tip: "The hardest part of build/buy/partner is honestly assessing internal capability. Most teams overestimate their ability to build well."
+  },
+  {
+    id: 11, cat: "behavioral", catLabel: "Behavioral",
+    freq: "high",
+    q: "Tell me about a product you launched that failed.",
+    note: "One of the most important questions in any PM interview. Shows self-awareness and learning agility.",
+    framework: { name: "Failure Debrief", steps: ["What We Built", "Why We Thought It Would Work", "What Happened", "Root Cause", "What I Learned"] },
+    keyPoints: [
+      "Pick a real failure — interviewers can tell when you're dressing up a success as a failure",
+      "Own your role in the failure without throwing teammates under the bus",
+      "The root cause analysis is the most important part — show you learned something non-obvious",
+      "Connect the lesson to how you work differently today"
+    ],
+    sample: [
+      "We built a social proof feature — showing users 'X people also purchased this' — to improve conversion on our e-commerce platform. I was confident it would work because A/B test data from Booking.com and Amazon showed strong lifts.",
+      "It actually decreased conversion by 8%. I was confused and defensive at first. After a deep dive, we found that our audience — B2B buyers purchasing on behalf of their company — perceived social proof as pressure rather than validation. They were trying to justify a rational procurement decision, and seeing that 'thousands of others bought this' felt manipulative rather than reassuring.",
+      "The root cause: I borrowed a tactic without validating that the underlying psychological mechanism applied to our specific user. B2C consumer psychology doesn't always translate to B2B procurement. I now have a principle I apply to every experiment: never lift a tactic without understanding why it works, and testing whether that 'why' applies to your users."
+    ],
+    pitfalls: [
+      "Choosing a failure that was 'outside your control' — you want a story where your judgment was wrong",
+      "Being vague about what you personally did differently afterward",
+      "Turning the failure story into a humble brag ('we failed but the company learned so much!')"
+    ],
+    tip: "The best failure stories have a counterintuitive lesson — something that changed how you think, not just a tactical checklist."
+  },
+  {
+    id: 12, cat: "product", catLabel: "Product Design",
+    freq: "high",
+    q: "How would you design a new feature for a social media app?",
+    note: "Often paired with a specific app — 'add a feature to Instagram/Twitter/LinkedIn'.",
+    framework: { name: "Feature Design", steps: ["Goal Clarify", "User Segments", "Problem", "Ideate", "Prioritize", "Solution", "Metrics", "Risks"] },
+    keyPoints: [
+      "The goal should come from a business/user problem, not from 'what would be cool'",
+      "Anchor on a specific user segment and their specific pain — don't design for everyone",
+      "Evaluate your feature against the platform's existing business model",
+      "Consider network effects — social features affect all users, not just feature adopters"
+    ],
+    sample: [
+      "Let me pick Instagram. Clarifying question: is the goal engagement, monetization, or creator retention? I'll assume creator retention because that's a known pressure point as creators migrate to TikTok.",
+      "Primary user: established creators with 50K-500K followers who are posting consistently but feeling like the algorithm is deprioritizing them. Their core pain: unpredictable reach makes it hard to build a sustainable creator business. Anxiety about the algorithm is the #1 reason creators I've interviewed consider platform switching.",
+      "My feature: 'Reach Forecast' — a lightweight dashboard showing creators their predicted reach for different post types (Reel vs. static vs. Story) based on their recent performance trends. Not algorithmic secrets, but directional guidance: 'Reels are reaching 3x more of your followers than static posts this month.' This gives creators agency and reduces the anxiety of unpredictability.",
+      "Success metrics: creator 30-day retention, posts per active creator per week, and creator satisfaction score. Guardrail: overall feed engagement per user shouldn't decrease."
+    ],
+    pitfalls: [
+      "Proposing a copycat feature from a competitor without explaining the strategic rationale",
+      "Ignoring platform-specific constraints (trust and safety, existing patterns, business model)",
+      "Designing a feature that benefits creators but hurts consumer engagement"
+    ],
+    tip: "For any social product question, explicitly address network effects — how does your feature change behavior for users who don't adopt it?"
+  },
+  {
+    id: 13, cat: "analytical", catLabel: "Analytical",
+    freq: "high",
+    q: "Estimate the market size for [X product].",
+    note: "e.g. 'Estimate the market for Uber for dog walking' or 'How big is the podcast market?'",
+    framework: { name: "Market Sizing", steps: ["Top-Down or Bottom-Up", "Define Market", "Calculate TAM", "SAM / SOM", "Sanity Check"] },
+    keyPoints: [
+      "Always state your approach (top-down or bottom-up) and why",
+      "Show your assumptions explicitly — interviewers care about your logic, not the exact number",
+      "Do a sanity check at the end — does your number feel right?",
+      "Distinguish TAM (total addressable market), SAM (serviceable), and SOM (obtainable)"
+    ],
+    sample: [
+      "I'll estimate the US market for a premium dog walking app. I'll use a bottom-up approach since we can anchor on the dog owner population.",
+      "US population: ~335M. Average household size: 2.5 people, so ~134M households. About 45% of US households own a dog = ~60M dog-owning households. Not all use professional walking services — I'd estimate 15% do regularly (urban dwellers, dual-income households, seniors) = ~9M households.",
+      "Average spend: let's say 3 walks per week at $25 per walk = $75/week × 50 weeks = ~$3,750/year per household. Total market: 9M households × $3,750 = ~$34 billion.",
+      "Sanity check: the US pet services market is reported at ~$10-15B annually including grooming, boarding, and walking. My $34B feels high — I might be overestimating frequency. Adjusting to 2 walks/week and 20% pricing at $20 gives ~$15B, which aligns better with reported figures. I'd present $15-20B as my estimate with the key assumption being walk frequency."
+    ],
+    pitfalls: [
+      "Presenting one number without showing your work — the reasoning is what's being evaluated",
+      "Not doing a sanity check — off-by-10x estimates signal poor intuition about scale",
+      "Being paralyzed by uncertainty — make explicit assumptions and move forward"
+    ],
+    tip: "The sanity check is not optional. Always anchor your estimate to a real-world data point you know."
+  },
+  {
+    id: 14, cat: "execution", catLabel: "Execution",
+    freq: "high",
+    q: "How do you work with engineers who push back on your timeline?",
+    note: "Tests your relationship with engineering and your understanding of the development process.",
+    framework: { name: "PM-Eng Partnership", steps: ["Listen First", "Understand Concern", "Trade-off Discussion", "Align on Outcome", "Escalate If Needed"] },
+    keyPoints: [
+      "Engineers usually have valid reasons — scope ambiguity, tech debt, or testing needs",
+      "Your job is to facilitate the trade-off conversation, not win the argument",
+      "Scope negotiation (what to cut) is usually more productive than timeline fights",
+      "Know when to escalate vs. when to adapt"
+    ],
+    sample: [
+      "When an engineer pushes back on a timeline, my first move is to understand the specific constraint — is it scope, testing time, a third-party dependency, or tech debt that needs addressing first? Engineers give timeline estimates for reasons, and those reasons tell me what we need to solve.",
+      "Usually the most productive conversation is about scope, not dates. I'll ask: 'If we have X weeks, what's the version we can ship confidently?' Together we define a v1 that hits the core user need, and we explicitly parking-lot the nice-to-haves for v1.1. This respects engineering's expertise while keeping momentum.",
+      "If a deadline is truly non-negotiable — say, a contractual commitment or a platform launch date — I bring that constraint into the conversation honestly: 'Here's what's driving the date and what's at stake.' Most engineers are willing to find creative solutions when they understand the real business context. I also make sure they're not carrying this alone — I'll loop in leadership to either resource the team better or adjust scope at the executive level."
+    ],
+    pitfalls: [
+      "Treating engineering estimates as negotiating positions to be argued down",
+      "Committing to timelines without engineering input and then working backward",
+      "Not understanding the difference between timeline pressure and scope pressure"
+    ],
+    tip: "The PM who says 'I trust your estimates' and then works backward from them has a fundamentally better engineering relationship than one who negotiates estimates."
+  },
+  {
+    id: 15, cat: "strategy", catLabel: "Strategy",
+    freq: "high",
+    q: "A competitor just launched a feature we were planning to build. What do you do?",
+    note: "Tests strategic thinking, competitive intelligence, and your ability to stay focused vs. react.",
+    framework: { name: "Competitive Response", steps: ["Assess Threat", "User Impact", "Differentiation Opportunity", "Options", "Recommendation"] },
+    keyPoints: [
+      "First reaction should be curiosity, not panic — their execution tells you things",
+      "Assess whether this actually affects your users' decision-making",
+      "Evaluate whether matching them is the right strategy vs. differentiating",
+      "Speed-to-copy is rarely a durable competitive advantage"
+    ],
+    sample: [
+      "My first step is honest assessment: does this competitor's launch actually change my users' behavior? Is this a feature users will switch for, or one that's good to have but not a switching trigger? I'd validate by talking to 5-10 users directly.",
+      "If the feature is truly table-stakes — users expect it — I'd accelerate our roadmap item. But I'd also ask: can we differentiate in execution? If they shipped a basic version, we have an opportunity to go deeper, integrate it more thoughtfully into our workflow, and make ours genuinely better rather than just shipping parity.",
+      "If the feature isn't actually a user priority — the competitor shipped it for press or competitive positioning rather than real demand — I'd resist the temptation to react. Reactive roadmaps are how products lose their identity. I'd note the competitive signal, share it with leadership, and stay focused on our own user research.",
+      "I'd also reverse-engineer their decision: what does their building this tell us about their strategy? That competitive intelligence is often more valuable than the feature itself."
+    ],
+    pitfalls: [
+      "Immediately pivoting the entire roadmap to match the competitor",
+      "Dismissing the competitive threat without actually validating with users",
+      "Not communicating the competitive development to stakeholders"
+    ],
+    tip: "The best response to a competitor launch is usually neither 'copy immediately' nor 'ignore.' It's 'understand, then decide deliberately.'"
+  },
+  {
+    id: 16, cat: "behavioral", catLabel: "Behavioral",
+    freq: "high",
+    q: "Why do you want to be a Product Manager?",
+    note: "Common for early-career candidates or those transitioning into PM roles.",
+    framework: { name: "Motivation Story", steps: ["Origin", "Evidence", "What You Love About PM", "Why Now / Why Here"] },
+    keyPoints: [
+      "Connect to a specific moment or realization — not a generic answer",
+      "Show you understand what PM actually is (strategy + execution + people)",
+      "Back it up with evidence: things you've already done that resemble PM work",
+      "End with why you're excited about this specific company/role"
+    ],
+    sample: [
+      "I became interested in PM through a specific experience. I was leading marketing at a startup and kept noticing that the features we were trying to market didn't actually match what users were asking for in support tickets. I started sitting in on engineering planning sessions uninvited — and realized that nobody was systematically connecting user feedback to what was being built.",
+      "I started doing that informally: running user interviews, creating a shared document of pain points with severity ratings, and presenting a prioritized list of improvements at sprint planning. Within two months, engineering started asking me to facilitate those sessions. That informal role was the most energizing work I'd done in years.",
+      "What I love about PM is that it requires you to be simultaneously strategic and deeply practical. You have to earn influence without authority, hold the user perspective in the room, and translate between engineering, business, and design fluently. I find all of that genuinely exciting rather than exhausting.",
+      "I'm specifically excited about this role because your product sits in a space I've been thinking about obsessively — and I want to do this work at a company where the product quality bar is high."
+    ],
+    pitfalls: [
+      "'I like working with people and I'm good at communication' — too generic, not PM-specific",
+      "Not having evidence of PM-like work you've already done",
+      "Saying you want to be PM because you want more impact — impact is vague"
+    ],
+    tip: "If you're transitioning from another role, name the PM-adjacent work you've already done. Evidence beats intent every time."
+  },
+  {
+    id: 17, cat: "product", catLabel: "Product Design",
+    freq: "high",
+    q: "What's your favorite product and why?",
+    note: "Deceptively simple. Interviewers are evaluating your product sense and analytical depth.",
+    framework: { name: "Product Analysis", steps: ["Name It", "Target User", "Core Problem", "Why It Works", "Trade-offs", "What You'd Improve"] },
+    keyPoints: [
+      "Pick something you can speak about with genuine depth — not just a popular answer",
+      "Analyze it like a PM: user segments, core problem, design decisions, business model",
+      "Show you can see what's not working too — interviewers get suspicious of pure praise",
+      "Avoid picking obvious answers (iPhone, Google Search) unless you have something fresh to say"
+    ],
+    sample: [
+      "My favorite product right now is Linear — the project management tool for software teams. The target user is engineering teams who find Jira slow, cluttered, and designed for managers rather than engineers.",
+      "The core problem it solves: most issue trackers create overhead that slows down the people doing the actual work. Linear inverts this. It's designed around keyboard-first interactions, opinionated workflows, and fast performance. Everything feels like it was built by someone who was frustrated using the alternatives.",
+      "What I think makes it work: radical constraint. They deliberately don't serve every use case. There are features Linear won't build because they'd add complexity that hurts their core user. That's a difficult product decision to hold as you grow — most products eventually try to be everything.",
+      "What I'd improve: the reporting and visibility layer for PMs and executives is underdeveloped. They've optimized so hard for the engineer-as-user that the PM-as-user experience is secondary. That's a real tension they'll have to resolve as they move upmarket."
+    ],
+    pitfalls: [
+      "Only talking about what you love without being able to critique the product",
+      "Picking a product you use but can't analyze deeply",
+      "Giving a surface-level answer ('great UX, easy to use') with no analytical depth"
+    ],
+    tip: "Have 2-3 products ready with different analysis angles. Consumer, B2B, and a marketplace shows range."
+  },
+  {
+    id: 18, cat: "analytical", catLabel: "Analytical",
+    freq: "high",
+    q: "How would you run an A/B test for a new feature?",
+    note: "Tests your understanding of experimentation, statistical validity, and business application.",
+    framework: { name: "Experimentation Design", steps: ["Hypothesis", "Control/Variant", "Metrics", "Sample Size", "Duration", "Decision Criteria", "Rollout"] },
+    keyPoints: [
+      "Start with a falsifiable hypothesis tied to a user behavior theory",
+      "Define primary and guardrail metrics before running the test",
+      "Calculate required sample size and run time before starting",
+      "Know when NOT to A/B test (small user base, ethical issues, one-time events)"
+    ],
+    sample: [
+      "Let's say we're testing whether adding social proof ('3,200 teams use this plan') to our pricing page increases conversion. My hypothesis: showing social proof will increase upgrade rates by 10% for users on the free tier because it reduces anxiety about making the wrong choice.",
+      "Setup: control = current pricing page, variant = pricing page with social proof counter. Primary metric: free-to-paid conversion rate at 7 days. Guardrail: overall session quality score shouldn't decrease (we don't want people to feel misled).",
+      "Sample size: I'd use a power calculator targeting 80% statistical power and 95% confidence level. If current conversion is 4%, detecting a 10% lift means detecting a 0.4pp change — that requires about 25,000 users per variant. If we get 5,000 daily active users on the pricing page, we need at least 10 days to reach statistical significance.",
+      "Decision criteria: if primary metric lifts by ≥5% with p<0.05 and no guardrail regression, we ship. If results are flat or negative, we kill and document the hypothesis for future context. I'd also segment results by new vs. returning users and plan type — heterogeneous effects matter."
+    ],
+    pitfalls: [
+      "Running the test for too short a duration — weekday vs. weekend behavior skews results",
+      "Peeking at results before the planned end date and calling significance early",
+      "Not accounting for network effects in social products where variants can bleed between groups"
+    ],
+    tip: "Pre-register your decision criteria before the test starts. It prevents post-hoc rationalization when results are inconclusive."
+  },
+  {
+    id: 19, cat: "execution", catLabel: "Execution",
+    freq: "high",
+    q: "How do you manage stakeholder expectations when you can't deliver what was promised?",
+    note: "Tests communication skills, honesty, and your ability to manage upward.",
+    framework: { name: "Expectation Reset", steps: ["Acknowledge Early", "Root Cause", "Options With Trade-offs", "Recommendation", "Agreement", "Follow-through"] },
+    keyPoints: [
+      "The biggest mistake is waiting too long to communicate bad news",
+      "Always bring a recommendation, not just a problem",
+      "Acknowledge your role without excessive self-flagellation",
+      "Agree on a new plan before ending the conversation"
+    ],
+    sample: [
+      "The most important principle: communicate early. A stakeholder who finds out two weeks before launch that a commitment won't be met has time to adapt. One who finds out the day of has no options — and their trust in you is damaged in a way that's very hard to recover.",
+      "My approach: as soon as I see the risk materializing, I have a private conversation with the key stakeholder before it becomes a team or leadership issue. I come with three things: what changed, why it changed, and what our options are. I present the options with trade-offs honestly, and I have a recommendation ready.",
+      "For example, if we committed to a full feature launch and we're going to miss scope, I'd frame it as: 'We have three paths — slip the date by 3 weeks and ship everything, ship on time with the core workflow and defer three secondary features, or descope more aggressively and launch a beta. I recommend option 2, here's why.' That conversation is much more productive than 'we're going to miss the deadline.'",
+      "After the conversation, I document the new agreement in writing and send a summary. Memory diverges quickly under pressure."
+    ],
+    pitfalls: [
+      "Waiting until it's too late — by then you've removed all the stakeholder's options",
+      "Coming with a problem and no solution — that makes you a reporter, not a PM",
+      "Blaming the team or external factors without taking any ownership"
+    ],
+    tip: "Stakeholders forgive almost any bad news that comes early. They rarely forgive bad news that comes late."
+  },
+  {
+    id: 20, cat: "strategy", catLabel: "Strategy",
+    freq: "high",
+    q: "How do you think about balancing short-term and long-term product goals?",
+    note: "Tests strategic maturity and your ability to hold tension between business pressure and vision.",
+    framework: { name: "Horizon Framework", steps: ["H1 (Core)", "H2 (Emerging)", "H3 (Exploratory)", "Resource Allocation", "Review Cadence"] },
+    keyPoints: [
+      "Show you understand that short-term pressure is real and ignoring it is naive",
+      "Articulate how you protect long-term investment without abandoning near-term needs",
+      "Use concrete mechanisms: how you actually allocate capacity across time horizons",
+      "Connect to company stage — early startup vs. mature company have different balances"
+    ],
+    sample: [
+      "I think about this through a portfolio lens rather than an either/or lens. Every quarter I try to allocate team capacity across three horizons: 60-70% on core reliability and short-term growth bets, 20-25% on emerging capabilities we'll need in 6-12 months, and 10-15% on exploratory work with high uncertainty but high potential.",
+      "The short-term work pays the bills and keeps the team credible with stakeholders. But you can't always be optimizing the existing surface — eventually you run out of quick wins and haven't built the next generation of capabilities. The teams that get caught in pure short-term optimization tend to wake up 18 months later and realize their architecture or product model has become the obstacle.",
+      "In practice, I protect the long-term work by making it explicit in the roadmap and connecting it to a specific future bet the company is making. If leadership has committed to moving into enterprise, then the long-term infrastructure work is 'we're building for enterprise.' That framing makes it much harder to cut when short-term pressure hits.",
+      "The ratio shifts with company stage. A pre-product-market-fit startup should be 80% short-term, just finding what works. A mature company can afford more long-term investment."
+    ],
+    pitfalls: [
+      "Being too philosophical without concrete mechanisms for how you actually protect long-term work",
+      "Ignoring the real tension — saying 'I always balance both' is not believable",
+      "Not acknowledging that the right balance changes with company stage and competitive environment"
+    ],
+    tip: "Concrete mechanisms > abstract principles. Tell them how you actually protect long-term investment in practice."
+  },
+  {
+    id: 21, cat: "behavioral", catLabel: "Behavioral",
+    freq: "high",
+    q: "How do you make decisions when you have conflicting user research and business requirements?",
+    note: "Tests your ability to hold user advocacy alongside commercial reality.",
+    framework: { name: "Conflict Resolution", steps: ["Identify Conflict", "Validate Both Sides", "Frame Trade-offs", "Find Synthesis", "Decide & Document"] },
+    keyPoints: [
+      "Show you take both seriously — dismissing either signals poor PM judgment",
+      "Look for solutions that satisfy the core need on both sides, not just split the difference",
+      "Acknowledge when one must take priority, and explain the reasoning",
+      "Document the trade-off explicitly so the team is aligned on what was decided and why"
+    ],
+    sample: [
+      "I had this exact situation when working on our subscription cancellation flow. User research clearly showed that the cancellation process was frustrating and damaged brand perception — users felt trapped. Business requirements wanted to maintain a friction-heavy 'save flow' to reduce voluntary churn.",
+      "Rather than picking one side, I validated both: yes, a hard-to-cancel flow does reduce churn short-term. And yes, the user research showed it was a significant trust destroyer with users who felt manipulated — which would hurt long-term retention and referral rates. I framed it as a trade-off between short-term churn vs. long-term LTV and brand trust.",
+      "The synthesis: we redesigned the cancel flow to be honest and easy, but added a 'pause subscription' option and a personalized downgrade offer. This removed the friction users hated while giving users who needed flexibility an alternative. Churn actually decreased slightly while trust scores improved significantly. The win was in finding a new option that both sides hadn't seen."
+    ],
+    pitfalls: [
+      "Automatically defaulting to 'the user is always right' — commercial viability matters",
+      "Automatically defaulting to 'business requirements win' — that's why PM exists",
+      "Not looking hard enough for synthesis before picking a side"
+    ],
+    tip: "The best PM answers to conflict questions end in synthesis, not compromise. Synthesis finds a new option; compromise just splits existing ones."
+  },
+  {
+    id: 22, cat: "product", catLabel: "Product Design",
+    freq: "high",
+    q: "How would you approach building a product for a market you know nothing about?",
+    note: "Tests research methodology, intellectual humility, and learning speed.",
+    framework: { name: "Research Sprint", steps: ["Desk Research", "Expert Interviews", "User Interviews", "Competitive Analysis", "Hypothesis Formation", "Prototype & Test"] },
+    keyPoints: [
+      "Intellectual humility first — acknowledge what you don't know",
+      "Show a systematic approach to accelerated learning",
+      "Demonstrate that you prioritize unlearning assumptions over confirming them",
+      "Connect to specific research methods you'd use and why"
+    ],
+    sample: [
+      "The first thing I'd do is acknowledge my assumptions and actively try to challenge them. I'd spend 2-3 days on desk research — market reports, regulatory landscape, competitive products, relevant forums and communities — but with the explicit goal of forming hypotheses to test, not conclusions to defend.",
+      "Then I'd prioritize direct exposure: 10-12 in-depth user interviews with people in the core segment, and 3-5 domain expert interviews — people who've spent years in this market. I'd ask about workflows, pain points, vocabulary, and what existing solutions get right and wrong. The vocabulary alone teaches you a lot — markets have their own language, and using the wrong words signals you're an outsider.",
+      "After a week or two of this immersion, I'd synthesize my hypotheses and build a low-fidelity prototype to test the riskiest ones. The fastest way to learn in an unfamiliar market is to put something in front of users and watch them react — not to keep researching in isolation.",
+      "I'd also find a domain expert or potential customer to serve as an informal advisory voice throughout the process — someone who can tell me when I'm about to make an embarrassing assumption."
+    ],
+    pitfalls: [
+      "Claiming you'd approach it the same way as any other market — that's either dishonest or shows low self-awareness",
+      "Doing only desk research without talking to actual users",
+      "Moving to solution-building too quickly before genuinely understanding the problem space"
+    ],
+    tip: "Interviewers in specialized industries respect 'I don't know this market yet, here's exactly how I'd learn it' far more than overconfidence."
+  },
+  {
+    id: 23, cat: "execution", catLabel: "Execution",
+    freq: "high",
+    q: "Describe how you write a product requirements document (PRD).",
+    note: "Tests your ability to communicate clearly with engineering and design.",
+    framework: { name: "PRD Structure", steps: ["Problem", "Goal & Metrics", "User Stories", "Requirements", "Design", "Edge Cases", "Open Questions"] },
+    keyPoints: [
+      "A PRD should enable the team to make good decisions without you in the room",
+      "Lead with the problem, not the solution — most bad PRDs skip the 'why'",
+      "User stories should describe behavior, not features",
+      "Open questions section is as important as the requirements section"
+    ],
+    sample: [
+      "My PRD structure starts with the problem statement — what user pain or business opportunity are we addressing? I try to write this in one paragraph that a new engineer could read and immediately understand why this work matters.",
+      "Then: goals and success metrics (primary metric, secondary, guardrails), target users and key use cases, and user stories in the format 'As [user], I want [action] so that [outcome].' User stories constrain scope because they keep the focus on user behavior, not feature lists.",
+      "The functional requirements section comes next — what must the product do, what should it do (nice-to-have), and what is explicitly out of scope. Out-of-scope is underrated; it prevents scope creep and misaligned expectations.",
+      "I include an edge cases section (what happens when X fails or the user does Y unexpected thing) and an open questions section. The open questions section is often the most valuable part — it surfaces the decisions that need to be made before or during development, and it signals to engineering that I know what we don't know yet."
+    ],
+    pitfalls: [
+      "Writing a PRD that's really a feature specification without the 'why'",
+      "Over-specifying the solution when you should specify the problem",
+      "Treating the PRD as a handoff document rather than a living collaboration tool"
+    ],
+    tip: "If a new engineer can read your PRD and explain back to you what problem you're solving and how you'll know if it worked — your PRD is good."
+  },
+  {
+    id: 24, cat: "analytical", catLabel: "Analytical",
+    freq: "high",
+    q: "How would you identify if your product has achieved product-market fit?",
+    note: "Tests understanding of PMF signals, both quantitative and qualitative.",
+    framework: { name: "PMF Signals", steps: ["Retention", "Engagement", "WTP", "Organic Growth", "Sean Ellis Test", "User Passion"] },
+    keyPoints: [
+      "PMF is felt before it's measured — look for both qualitative and quantitative signals",
+      "Retention curve flattening is the strongest quantitative signal",
+      "The Sean Ellis test ('How disappointed would you be?') is a useful directional tool",
+      "PMF is segment-specific — you may have fit with one cohort but not another"
+    ],
+    sample: [
+      "Product-market fit is one of those concepts where you often sense it before you can fully measure it — the team stops pulling users toward the product and starts feeling pushed by user demand. But there are concrete signals I'd look for.",
+      "Quantitatively: retention curve behavior is the strongest signal. If I plot cohort retention over 90 days and the curve flattens rather than approaching zero, that means a percentage of users found enough value to stay. For consumer apps I'd look for D30 retention above 20-25%; for B2B SaaS, the benchmark is much higher — monthly active usage by accounts, not just logins.",
+      "I'd also run Sean Ellis's 'How disappointed would you be if this product disappeared?' survey. If more than 40% of users say 'very disappointed,' that's a strong PMF signal. Below 20% and you're clearly not there yet.",
+      "Qualitatively: are users organically referring others without being prompted? Are they using the product in ways you didn't anticipate? Are they angry when features they rely on change? User anger about product changes is actually a positive signal — it means they've integrated the product into their workflow.",
+      "Important caveat: PMF is segment-specific. You might have strong fit with one user type and none with another. I'd segment retention and engagement by persona to find where fit is strongest."
+    ],
+    pitfalls: [
+      "Only looking at top-line numbers like DAU or total signups — those don't tell you about fit",
+      "Declaring PMF based on a good launch week without retention data",
+      "Not recognizing that PMF with one segment means nothing for adjacent segments"
+    ],
+    tip: "The most honest PMF check: would a meaningful number of users be genuinely angry if you shut down tomorrow? If not, you're not there."
+  },
+  {
+    id: 25, cat: "strategy", catLabel: "Strategy",
+    freq: "high",
+    q: "Where do you see yourself in 5 years?",
+    note: "Standard closing question. Shows self-awareness, ambition, and alignment with the role.",
+    framework: { name: "Career Story", steps: ["Near-term Goals", "Skills to Build", "Long-term Vision", "Connection to This Role"] },
+    keyPoints: [
+      "Be honest but strategic — show ambition without suggesting you'll leave in 18 months",
+      "Connect your career goals to skills you'd build in this specific role",
+      "Avoid the generic 'leading a team / being a director' answer without substance",
+      "It's okay to be a bit uncertain — that's real and interviewers respect it"
+    ],
+    sample: [
+      "In the near term — the next 2-3 years — I want to go deep in B2B product, specifically around the 0-to-1 product expansion challenge. I've been most energized when working on problems where the market definition is still being figured out, and I want to build a strong track record of finding those moments where product and market click together.",
+      "Longer term, I see myself either running a product org as a VP of Product or making the jump to founding something. Both paths require the same underlying skill: the judgment to make good product bets with limited information, and the ability to build high-trust relationships with engineering, design, and commercial teams. I want to accumulate reps on both.",
+      "This role specifically is interesting to me because [company] is at the exact inflection point where those skills are most tested — you're past early PMF and now the challenge is building the systems and team to scale. That's where I want to spend the next 3 years."
+    ],
+    pitfalls: [
+      "'I want your job' — even as a joke, it's awkward",
+      "Being so vague it signals you haven't thought about your career",
+      "Saying you want to start a company in 2 years — suggests low commitment to this role",
+      "Answering without connecting back to why this specific role accelerates your goals"
+    ],
+    tip: "Frame the 5-year answer around skills and experiences you want to accumulate, not titles you want to hold. Skills are more compelling than ladders."
+  }
+];
+
+const categories = {
+  all: 'All',
+  behavioral: 'Behavioral',
+  product: 'Product Design',
+  strategy: 'Strategy',
+  analytical: 'Analytical',
+  execution: 'Execution'
+};
+
+let currentId = 1;
+let currentFilter = 'all';
+
+function filteredQs() {
+  return currentFilter === 'all' ? questions : questions.filter(q => q.cat === currentFilter);
+}
+
+function buildSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.innerHTML = '';
+  const byCategory = {};
+  for (const q of filteredQs()) {
+    if (!byCategory[q.cat]) byCategory[q.cat] = [];
+    byCategory[q.cat].push(q);
+  }
+  const catOrder = ['behavioral', 'product', 'strategy', 'analytical', 'execution'];
+  for (const cat of catOrder) {
+    if (!byCategory[cat]) continue;
+    const sec = document.createElement('div');
+    sec.className = 'aside-section';
+    const lbl = document.createElement('div');
+    lbl.className = 'aside-cat';
+    lbl.textContent = categories[cat];
+    sec.appendChild(lbl);
+    for (const q of byCategory[cat]) {
+      const item = document.createElement('div');
+      item.className = 'aside-item' + (q.id === currentId ? ' active' : '');
+      item.dataset.id = q.id;
+      const shortQ = q.q.length > 42 ? q.q.slice(0, 42) + '…' : q.q;
+      item.innerHTML = `<span>${shortQ}</span><span class="qnum">Q${q.id}</span>`;
+      item.addEventListener('click', () => { currentId = q.id; buildSidebar(); showCard(q.id); });
+      sec.appendChild(item);
+    }
+    sidebar.appendChild(sec);
+  }
+}
+
+function showCard(id) {
+  document.querySelectorAll('.q-card').forEach(c => c.classList.remove('active'));
+  const card = document.getElementById(`qcard-${id}`);
+  if (card) { card.classList.add('active'); card.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  buildNavArrows(id);
+}
+
+function buildNavArrows(id) {
+  const qs = filteredQs();
+  const idx = qs.findIndex(q => q.id === id);
+  const navDiv = document.getElementById(`qnav-${id}`);
+  if (!navDiv) return;
+  const prev = qs[idx - 1];
+  const next = qs[idx + 1];
+  navDiv.innerHTML = `
+    <button class="nav-arrow" ${!prev ? 'disabled' : ''} onclick="${prev ? `goTo(${prev.id})` : ''}">
+      ← ${prev ? prev.q.slice(0, 28) + '…' : 'First question'}
+    </button>
+    <span class="q-counter">Q${id} of ${questions.length}</span>
+    <button class="nav-arrow" ${!next ? 'disabled' : ''} onclick="${next ? `goTo(${next.id})` : ''}">
+      ${next ? next.q.slice(0, 28) + '…' : 'Last question'} →
+    </button>
+  `;
+}
+
+function goTo(id) {
+  currentId = id;
+  buildSidebar();
+  showCard(id);
+}
+
+function buildCards() {
+  const mainEl = document.getElementById('main');
+  mainEl.innerHTML = '';
+  for (const q of questions) {
+    const catTagClass = `cat-${q.cat}`;
+    const frameworkSteps = q.framework.steps.map(s => `<span class="framework-step">${s}</span>`).join('');
+    const keyPointsHTML = q.keyPoints.map(p => `<li>${p}</li>`).join('');
+    const sampleHTML = q.sample.map(p => `<p>${p}</p>`).join('');
+    const pitfallsHTML = q.pitfalls.map(p => `<li>${p}</li>`).join('');
+
+    const card = document.createElement('div');
+    card.className = 'q-card' + (q.id === 1 ? ' active' : '');
+    card.id = `qcard-${q.id}`;
+    card.innerHTML = `
+      <div class="q-header">
+        <div class="q-meta">
+          <span class="q-cat-tag ${catTagClass}">${q.catLabel}</span>
+          <span class="freq-badge ${q.freq === 'high' ? 'high' : ''}">
+            ${q.freq === 'high' ? '🔥 Very Frequently Asked' : 'Frequently Asked'}
+          </span>
+        </div>
+        <div class="q-question">${q.q}</div>
+        <div class="q-note">${q.note}</div>
+      </div>
+
+      <div class="framework-box">
+        <div class="framework-icon">⚡</div>
+        <div>
+          <div class="framework-name">Recommended Framework</div>
+          <div class="framework-steps">${frameworkSteps}</div>
+        </div>
+      </div>
+
+      <div class="answer-block">
+        <h3>Key Points to Cover</h3>
+        <ul class="bullet-list">${keyPointsHTML}</ul>
+      </div>
+
+      <div class="example-answer">${sampleHTML}</div>
+
+      <div class="pitfalls">
+        <h3>⚠ Common Pitfalls</h3>
+        <ul>${pitfallsHTML}</ul>
+      </div>
+
+      <div class="pro-tip">
+        <span class="tip-icon">💡</span>
+        <p><strong>Pro Tip: </strong>${q.tip}</p>
+      </div>
+
+      <div class="q-nav" id="qnav-${q.id}"></div>
+    `;
+    mainEl.appendChild(card);
+  }
+  buildNavArrows(1);
+}
+
+// Filters
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    const qs = filteredQs();
+    if (qs.length) {
+      currentId = qs[0].id;
+      buildSidebar();
+      showCard(currentId);
+    }
+  });
+});
+
+buildCards();
+buildSidebar();
+showCard(1);
+</script>
+</body>
+</html>
